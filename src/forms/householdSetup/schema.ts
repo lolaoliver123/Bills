@@ -93,13 +93,18 @@ export const schema = z
     electricVehicle: electricVehicleSchema,
   })
   .superRefine((data, ctx) => {
-    (["hasGas", "hasSolar", "hasHeatPump", "hasBatteries", "hasElectricVehicle"] as const).forEach((field) => {
+    (["hasGas", "hasSolar", "hasBatteries", "hasElectricVehicle"] as const).forEach((field) => {
       if (data[field] === undefined) required(ctx, [field], "Please choose yes or no");
     });
 
     if (data.hasGas) {
       if (data.hasGasHeating === undefined) required(ctx, ["hasGasHeating"], "Please choose yes or no");
       requirePositive(ctx, data.gasCost, ["gasCost"]);
+    }
+
+    const hasGasHeating = data.hasGas === true && data.hasGasHeating === true;
+    if (!hasGasHeating && data.hasHeatPump === undefined) {
+      required(ctx, ["hasHeatPump"], "Please choose yes or no");
     }
 
     requirePositive(ctx, data.electricCost, ["electricCost"]);
@@ -114,7 +119,7 @@ export const schema = z
       requirePositiveInteger(ctx, data.battery.numberOfBatteries, ["battery", "numberOfBatteries"]);
     }
 
-    if (data.hasHeatPump) requirePositive(ctx, data.heatPump.capacityKw, ["heatPump", "capacityKw"]);
+    if (!hasGasHeating && data.hasHeatPump) requirePositive(ctx, data.heatPump.capacityKw, ["heatPump", "capacityKw"]);
 
     if (data.hasElectricVehicle) {
       requirePositive(ctx, data.electricVehicle.batteryCapacity, ["electricVehicle", "batteryCapacity"]);

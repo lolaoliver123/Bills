@@ -38,18 +38,6 @@ function KeepCalculatedFieldsInSync() {
   return null;
 }
 
-function SystemTheme() {
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const updateTheme = () => document.documentElement.classList.toggle("dark", mediaQuery.matches);
-    updateTheme();
-    mediaQuery.addEventListener("change", updateTheme);
-    return () => mediaQuery.removeEventListener("change", updateTheme);
-  }, []);
-
-  return null;
-}
-
 function downloadHousehold(values: Household) {
   const result = withCalculatedFields(values);
   const file = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
@@ -64,7 +52,6 @@ function downloadHousehold(values: Household) {
 function App() {
   return (
     <div className="min-h-screen bg-muted/30 px-4 py-8 sm:px-6 sm:py-12">
-      <SystemTheme />
       <main className="mx-auto w-full max-w-2xl">
         <Card>
           <CardHeader className="gap-2">

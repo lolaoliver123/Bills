@@ -18,6 +18,7 @@ const DetailCard = ({ title, children }: { title: string; children: React.ReactN
 
 const HouseholdFields = () => {
     const {values} = useFormikContext<Household>();
+    const shouldAskAboutHeatPump = !(values.hasGas && values.hasGasHeating);
 
     return (
         <div className="grid gap-6">
@@ -39,8 +40,8 @@ const HouseholdFields = () => {
                 </DetailCard>
             ) : null}
 
-            <BooleanField name="hasHeatPump" label="Does the household have a heat pump?"/>
-            {values.hasHeatPump ? (
+            {shouldAskAboutHeatPump ? <BooleanField name="hasHeatPump" label="Does the household have a heat pump?"/> : null}
+            {shouldAskAboutHeatPump && values.hasHeatPump ? (
                 <DetailCard title="Heat pump">
                     <NumberField name="heatPump.capacityKw" label="Capacity" unit="kW"/>
                 </DetailCard>

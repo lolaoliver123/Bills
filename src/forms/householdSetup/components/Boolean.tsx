@@ -13,8 +13,8 @@ export const BooleanField = ({ name, label }: { name: string; label: string }) =
             <RadioGroup
                 value={field.value === undefined ? undefined : String(field.value)}
                 onValueChange={(value) => {
+                    void helpers.setTouched(true, false);
                     void helpers.setValue(value === "true");
-                    void helpers.setTouched(true);
                 }}
                 aria-invalid={meta.touched && Boolean(meta.error)}
                 aria-describedby={meta.touched && meta.error ? errorId : undefined}
