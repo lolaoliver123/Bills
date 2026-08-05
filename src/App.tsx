@@ -1,11 +1,12 @@
-import {Formik, Form, setIn, useFormikContext, type FormikErrors} from "formik";
-import {useEffect} from "react";
-import {initialValues, schema, withCalculatedFields, type Household} from "./forms/householdSetup/schema";
+import {Form, Formik, type FormikErrors, setIn, useFormikContext} from "formik";
+import {useEffect, useState} from "react";
+import {type Household, initialValues, schema, withCalculatedFields} from "./forms/householdSetup/schema";
 import HouseholdFields from "./forms/householdSetup/components/Household.tsx";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import NetBarChart from "@/components/graph/Graph.tsx";
-import {tempData} from "@/components/graph/tempData.ts";
+import {estimateDailyUsage} from "@/components/graph/tempData.ts";
+import {idealHousehold} from "@/forms/householdSetup/householdScenarios.ts";
 
 const validationErrors = (values: Household): FormikErrors<Household> => {
     const result = schema.safeParse(values);
@@ -40,29 +41,22 @@ const KeepCalculatedFieldsInSync = () => {
     return null;
 };
 
-const downloadHousehold = (values: Household) => {
-    const result = withCalculatedFields(values);
-    const file = new Blob([JSON.stringify(result, null, 2)], {type: "application/json"});
-    const url = URL.createObjectURL(file);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "household.json";
-    link.click();
-    URL.revokeObjectURL(url);
-};
-
 const App = () => {
+    const [submittedHousehold, setSubmittedHousehold] = useState<Household | null>(null);
+
     return (
         <div className="min-h-screen bg-muted/30 px-4 py-8 sm:px-6 sm:py-12">
-            <main className="mx-auto w-full max-w-2xl">
-                <Card>
+            <main className="mx-auto w-full max-w-6xl space-y-8">
+                <Card className="mx-auto max-w-2xl">
                     <CardHeader className="gap-2">
                         <CardTitle className="text-2xl sm:text-3xl">Household setup</CardTitle>
                         <CardDescription>Tell us about the household’s energy equipment and monthly
                             bills.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Formik initialValues={initialValues} validate={validationErrors} onSubmit={downloadHousehold}>
+                        <Formik initialValues={initialValues} validate={validationErrors} onSubmit={(values: Household) => {
+                            setSubmittedHousehold(withCalculatedFields(values));
+                        }}>
                             <Form noValidate className="space-y-8">
                                 <KeepCalculatedFieldsInSync/>
                                 <HouseholdFields/>
@@ -71,7 +65,28 @@ const App = () => {
                         </Formik>
                     </CardContent>
                 </Card>
-                <NetBarChart data={tempData}></NetBarChart>
+                {submittedHousehold ? (
+                    <section className="grid gap-8" aria-label="Estimated household energy comparison">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Current household</CardTitle>
+                                <CardDescription>Estimated usage for an average day based on your answers.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="overflow-x-auto">
+                                <NetBarChart data={estimateDailyUsage(submittedHousehold)}/>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Ideal household</CardTitle>
+                                <CardDescription>Estimated usage with a heat pump, solar panels, and battery storage.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="overflow-x-auto">
+                                <NetBarChart data={estimateDailyUsage(idealHousehold)}/>
+                            </CardContent>
+                        </Card>
+                    </section>
+                ) : null}
             </main>
         </div>
     );
