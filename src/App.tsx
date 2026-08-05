@@ -1,122 +1,189 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Formik, Form, setIn, useField, useFormikContext, type FormikErrors } from "formik";
+import { useEffect } from "react";
+import "./App.css";
+import { initialValues, schema, withCalculatedFields, type Household } from "./forms/householdSetup/schema";
 
-function App() {
-  const [count, setCount] = useState(0)
+function validationErrors(values: Household): FormikErrors<Household> {
+  const result = schema.safeParse(values);
+  if (result.success) return {};
+
+  return result.error.issues.reduce<FormikErrors<Household>>(
+    (errors, issue) => setIn(errors, issue.path.join("."), issue.message),
+    {},
+  );
+}
+
+function BooleanField({ name, label }: { name: string; label: string }) {
+  const [field, meta, helpers] = useField<boolean | undefined>(name);
+
+  return (
+    <fieldset className="field boolean-field">
+      <legend>{label}</legend>
+      <label>
+        <input
+          type="radio"
+          name={name}
+          checked={field.value === true}
+          onChange={() => helpers.setValue(true)}
+          onBlur={() => helpers.setTouched(true)}
+        />
+        Yes
+      </label>
+      <label>
+        <input
+          type="radio"
+          name={name}
+          checked={field.value === false}
+          onChange={() => helpers.setValue(false)}
+          onBlur={() => helpers.setTouched(true)}
+        />
+        No
+      </label>
+      {meta.touched && meta.error ? <span className="error">{meta.error}</span> : null}
+    </fieldset>
+  );
+}
+
+function NumberField({ name, label, unit }: { name: string; label: string; unit?: string }) {
+  const [field, meta, helpers] = useField<number | undefined>(name);
+
+  return (
+    <label className="field">
+      <span>{label}</span>
+      <div className="input-with-unit">
+        <input
+          id={name}
+          name={name}
+          type="number"
+          min="0"
+          step="any"
+          value={field.value ?? ""}
+          onBlur={field.onBlur}
+          onChange={(event) => helpers.setValue(event.target.value === "" ? undefined : Number(event.target.value))}
+        />
+        {unit ? <span>{unit}</span> : null}
+      </div>
+      {meta.touched && meta.error ? <span className="error">{meta.error}</span> : null}
+    </label>
+  );
+}
+
+function CalculatedField({ label, value, unit }: { label: string; value?: number; unit?: string }) {
+  return (
+    <label className="field">
+      <span>{label}</span>
+      <div className="input-with-unit">
+        <input type="number" value={value ?? ""} readOnly aria-label={label} />
+        {unit ? <span>{unit}</span> : null}
+      </div>
+    </label>
+  );
+}
+
+function KeepCalculatedFieldsInSync() {
+  const { values, setFieldValue } = useFormikContext<Household>();
+  const calculated = withCalculatedFields(values);
+
+  useEffect(() => {
+    if (calculated.solar.valueOfTotalOutput !== values.solar.valueOfTotalOutput) {
+      void setFieldValue("solar.valueOfTotalOutput", calculated.solar.valueOfTotalOutput, false);
+    }
+    if (calculated.battery.totalStorage !== values.battery.totalStorage) {
+      void setFieldValue("battery.totalStorage", calculated.battery.totalStorage, false);
+    }
+  }, [
+    calculated.battery.totalStorage,
+    calculated.solar.valueOfTotalOutput,
+    setFieldValue,
+    values.battery.totalStorage,
+    values.solar.valueOfTotalOutput,
+  ]);
+
+  return null;
+}
+
+function HouseholdFields() {
+  const { values } = useFormikContext<Household>();
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <BooleanField name="hasGas" label="Does the household have gas?" />
+      {values.hasGas ? (
+        <section className="conditional-section">
+          <BooleanField name="hasGasHeating" label="Is the gas used for heating?" />
+          <NumberField name="gasCost" label="Monthly gas bill" unit="£" />
+        </section>
+      ) : null}
 
-      <div className="ticks"></div>
+      <BooleanField name="hasSolar" label="Does the household have solar panels?" />
+      {values.hasSolar ? (
+        <section className="conditional-section">
+          <h2>Solar panels</h2>
+          <NumberField name="solar.averageIndividualPanelOutput" label="Average individual panel output" unit="kW" />
+          <NumberField name="solar.numberOfPanels" label="Number of panels" />
+          <CalculatedField label="Total solar output" value={values.solar.valueOfTotalOutput} unit="kW" />
+        </section>
+      ) : null}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      <BooleanField name="hasHeatPump" label="Does the household have a heat pump?" />
+      {values.hasHeatPump ? (
+        <section className="conditional-section">
+          <h2>Heat pump</h2>
+          <NumberField name="heatPump.capacityKw" label="Capacity" unit="kW" />
+        </section>
+      ) : null}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      <BooleanField name="hasBatteries" label="Does the household have batteries?" />
+      {values.hasBatteries ? (
+        <section className="conditional-section">
+          <h2>Battery storage</h2>
+          <NumberField name="battery.averageBatteryCapacity" label="Average battery capacity" unit="kWh" />
+          <NumberField name="battery.numberOfBatteries" label="Number of batteries" />
+          <CalculatedField label="Total storage" value={values.battery.totalStorage} unit="kWh" />
+        </section>
+      ) : null}
+
+      <BooleanField name="hasElectricVehicle" label="Does the household have an electric vehicle?" />
+      {values.hasElectricVehicle ? (
+        <section className="conditional-section">
+          <h2>Electric vehicle</h2>
+          <NumberField name="electricVehicle.batteryCapacity" label="Battery capacity" unit="kWh" />
+          <NumberField name="electricVehicle.numberOfTotalChargesPerWeek" label="Charges per week" />
+          <BooleanField name="electricVehicle.isVoltageToGrid" label="Can it supply electricity back to the grid?" />
+        </section>
+      ) : null}
+
+      <NumberField name="electricCost" label="Monthly electricity bill" unit="£" />
     </>
-  )
+  );
 }
 
-export default App
+function downloadHousehold(values: Household) {
+  const result = withCalculatedFields(values);
+  const file = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(file);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "household.json";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function App() {
+  return (
+    <main className="household-form">
+      <h1>Household setup</h1>
+      <p>Tell us about the household’s energy equipment and monthly bills.</p>
+
+      <Formik initialValues={initialValues} validate={validationErrors} onSubmit={downloadHousehold}>
+        <Form noValidate>
+          <KeepCalculatedFieldsInSync />
+          <HouseholdFields />
+          <button type="submit">Download household.json</button>
+        </Form>
+      </Formik>
+    </main>
+  );
+}
+
+export default App;
