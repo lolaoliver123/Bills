@@ -1,32 +1,35 @@
-import {useField} from "formik";
+import { useField } from "formik";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export const BooleanField = ({ name, label }: { name: string; label: string }) => {
     const [field, meta, helpers] = useField<boolean | undefined>(name);
+    const inputId = name.replaceAll(".", "-");
+    const errorId = `${inputId}-error`;
 
     return (
-        <fieldset className="field boolean-field">
-            <legend>{label}</legend>
-            <label>
-                <input
-                    type="radio"
-                    name={name}
-                    checked={field.value === true}
-                    onChange={() => helpers.setValue(true)}
-                    onBlur={() => helpers.setTouched(true)}
-                />
-                Yes
-            </label>
-            <label>
-                <input
-                    type="radio"
-                    name={name}
-                    checked={field.value === false}
-                    onChange={() => helpers.setValue(false)}
-                    onBlur={() => helpers.setTouched(true)}
-                />
-                No
-            </label>
-            {meta.touched && meta.error ? <span className="error">{meta.error}</span> : null}
-        </fieldset>
+        <div className="space-y-2">
+            <Label>{label}</Label>
+            <RadioGroup
+                value={field.value === undefined ? undefined : String(field.value)}
+                onValueChange={(value) => {
+                    void helpers.setValue(value === "true");
+                    void helpers.setTouched(true);
+                }}
+                aria-invalid={meta.touched && Boolean(meta.error)}
+                aria-describedby={meta.touched && meta.error ? errorId : undefined}
+                className="flex gap-6"
+            >
+                <div className="flex items-center gap-2">
+                    <RadioGroupItem id={`${inputId}-yes`} value="true" />
+                    <Label htmlFor={`${inputId}-yes`} className="font-normal">Yes</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                    <RadioGroupItem id={`${inputId}-no`} value="false" />
+                    <Label htmlFor={`${inputId}-no`} className="font-normal">No</Label>
+                </div>
+            </RadioGroup>
+            {meta.touched && meta.error ? <p id={errorId} className="text-sm text-destructive">{meta.error}</p> : null}
+        </div>
     );
 };

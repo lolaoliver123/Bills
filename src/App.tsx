@@ -1,8 +1,9 @@
 import { Formik, Form, setIn, useFormikContext, type FormikErrors } from "formik";
 import { useEffect } from "react";
-import "./App.css";
 import { initialValues, schema, withCalculatedFields, type Household } from "./forms/householdSetup/schema";
 import HouseholdFields from "./forms/householdSetup/components/Household.tsx";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const validationErrors = (values: Household): FormikErrors<Household> => {
   const result = schema.safeParse(values);
@@ -37,6 +38,18 @@ function KeepCalculatedFieldsInSync() {
   return null;
 }
 
+function SystemTheme() {
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const updateTheme = () => document.documentElement.classList.toggle("dark", mediaQuery.matches);
+    updateTheme();
+    mediaQuery.addEventListener("change", updateTheme);
+    return () => mediaQuery.removeEventListener("change", updateTheme);
+  }, []);
+
+  return null;
+}
+
 function downloadHousehold(values: Household) {
   const result = withCalculatedFields(values);
   const file = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
@@ -50,18 +63,26 @@ function downloadHousehold(values: Household) {
 
 function App() {
   return (
-    <main className="household-form">
-      <h1>Household setup</h1>
-      <p>Tell us about the household’s energy equipment and monthly bills.</p>
-
-      <Formik initialValues={initialValues} validate={validationErrors} onSubmit={downloadHousehold}>
-        <Form noValidate>
-          <KeepCalculatedFieldsInSync />
-          <HouseholdFields />
-          <button type="submit">Download household.json</button>
-        </Form>
-      </Formik>
-    </main>
+    <div className="min-h-screen bg-muted/30 px-4 py-8 sm:px-6 sm:py-12">
+      <SystemTheme />
+      <main className="mx-auto w-full max-w-2xl">
+        <Card>
+          <CardHeader className="gap-2">
+            <CardTitle className="text-2xl sm:text-3xl">Household setup</CardTitle>
+            <CardDescription>Tell us about the household’s energy equipment and monthly bills.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Formik initialValues={initialValues} validate={validationErrors} onSubmit={downloadHousehold}>
+              <Form noValidate className="space-y-8">
+                <KeepCalculatedFieldsInSync />
+                <HouseholdFields />
+                <Button type="submit" size="lg">Download household.json</Button>
+              </Form>
+            </Formik>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
   );
 }
 
