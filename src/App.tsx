@@ -16,7 +16,7 @@ const validationErrors = (values: Household): FormikErrors<Household> => {
 };
 
 
-function KeepCalculatedFieldsInSync() {
+const KeepCalculatedFieldsInSync = () => {
   const { values, setFieldValue } = useFormikContext<Household>();
   const calculated = withCalculatedFields(values);
 
@@ -36,9 +36,9 @@ function KeepCalculatedFieldsInSync() {
   ]);
 
   return null;
-}
+};
 
-function downloadHousehold(values: Household) {
+const downloadHousehold = (values: Household) => {
   const result = withCalculatedFields(values);
   const file = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(file);
@@ -47,9 +47,9 @@ function downloadHousehold(values: Household) {
   link.download = "household.json";
   link.click();
   URL.revokeObjectURL(url);
-}
+};
 
-function App() {
+const App = () => {
   return (
     <div className="min-h-screen bg-muted/30 px-4 py-8 sm:px-6 sm:py-12">
       <main className="mx-auto w-full max-w-2xl">
@@ -71,6 +71,6 @@ function App() {
       </main>
     </div>
   );
-}
+};
 
 export default App;

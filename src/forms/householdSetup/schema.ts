@@ -61,21 +61,21 @@ const electricVehicleSchema = z.object({
   isVoltageToGrid: z.boolean().optional(),
 });
 
-function required(ctx: z.RefinementCtx, path: (string | number)[], message = "This field is required") {
+const required = (ctx: z.RefinementCtx, path: (string | number)[], message = "This field is required") => {
   ctx.addIssue({ code: "custom", path, message });
-}
+};
 
-function requirePositive(ctx: z.RefinementCtx, value: number | undefined, path: (string | number)[]) {
+const requirePositive = (ctx: z.RefinementCtx, value: number | undefined, path: (string | number)[]) => {
   if (value === undefined) required(ctx, path);
   else if (value <= 0) ctx.addIssue({ code: "custom", path, message: "Must be greater than 0" });
-}
+};
 
-function requirePositiveInteger(ctx: z.RefinementCtx, value: number | undefined, path: (string | number)[]) {
+const requirePositiveInteger = (ctx: z.RefinementCtx, value: number | undefined, path: (string | number)[]) => {
   requirePositive(ctx, value, path);
   if (value !== undefined && !Number.isInteger(value)) {
     ctx.addIssue({ code: "custom", path, message: "Must be a whole number" });
   }
-}
+};
 
 export const schema = z
   .object({
@@ -157,7 +157,7 @@ export const initialValues: Household = {
   },
 };
 
-export function withCalculatedFields(values: Household): Household {
+export const withCalculatedFields = (values: Household): Household => {
   const solarOutput =
     values.solar.averageIndividualPanelOutput !== undefined && values.solar.numberOfPanels !== undefined
       ? values.solar.averageIndividualPanelOutput * values.solar.numberOfPanels
@@ -172,4 +172,4 @@ export function withCalculatedFields(values: Household): Household {
     solar: { ...values.solar, valueOfTotalOutput: solarOutput },
     battery: { ...values.battery, totalStorage },
   };
-}
+};

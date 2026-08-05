@@ -18,5 +18,8 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      'func-style': ['error', 'expression', { allowArrowFunctions: true }],
+    },
   },
 ])
