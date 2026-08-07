@@ -2,7 +2,6 @@ import type {Household} from "@/forms/householdSetup/schema";
 
 export type GraphData = {
     hour: number;
-    gas: number;
     solar: number;
     battery: number;
     electricity: number;
@@ -20,15 +19,6 @@ const GENERAL_ELECTRICITY = [
     300, 280, 230, 240, 300, 520, 680, 720, 560, 380, 240, 180,
 ];
 
-const COOKING_GAS = [
-    0, 0, 0, 0, 0, 0, 80, 240, 120, 0, 0, 40,
-    120, 40, 0, 0, 0, 100, 420, 560, 260, 80, 0, 0,
-];
-
-const GAS_HEATING = [
-    300, 280, 260, 250, 280, 450, 1100, 1450, 900, 420, 260, 200,
-    180, 180, 200, 240, 380, 800, 1400, 1700, 1450, 950, 600, 400,
-];
 
 const HEAT_PUMP_ELECTRICITY = [
     220, 200, 190, 180, 200, 300, 620, 760, 520, 300, 220, 180,
@@ -46,7 +36,7 @@ const BATTERY_FLOW = [
     450, 420, 300, 120, -40, -220, -360, -420, -360, -260, -160, -100,
 ];
 
-// A 50 kWh EV charged twice weekly averages roughly 14.3 kWh per day.
+// A 50 kWh EV charged twice-weekly averages roughly 14.3 kWh per day.
 const EV_CHARGING = [
     3570, 3570, 3570, 3570, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -61,9 +51,7 @@ export const estimateDailyUsage = (household: Household): GraphData[] => {
     const batteryRatio = household.hasBatteries
         ? (household.battery.totalStorage ?? 0) / REFERENCE_BATTERY_KWH
         : 0;
-    const heatPumpRatio = household.hasHeatPump
-        ? (household.heatPump.capacityKw ?? 0) / REFERENCE_HEAT_PUMP_KW
-        : 0;
+    const heatPumpRatio =(household.heatPump.capacityKw ?? 0) / REFERENCE_HEAT_PUMP_KW;
     const evRatio = household.hasElectricVehicle
         ? ((household.electricVehicle.batteryCapacity ?? 0) *
             (household.electricVehicle.numberOfTotalChargesPerWeek ?? 0)) /
@@ -72,9 +60,6 @@ export const estimateDailyUsage = (household: Household): GraphData[] => {
 
     return GENERAL_ELECTRICITY.map((generalElectricity, hour) => ({
         hour,
-        gas: household.hasGas
-            ? COOKING_GAS[hour] + (household.hasGasHeating ? GAS_HEATING[hour] : 0)
-            : 0,
         solar: scale(SOLAR_GENERATION[hour], solarRatio),
         battery: scale(BATTERY_FLOW[hour], batteryRatio),
         electricity: generalElectricity + scale(HEAT_PUMP_ELECTRICITY[hour], heatPumpRatio),

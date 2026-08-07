@@ -21,7 +21,6 @@ const NetBarChart = ({data}: NetBarChartProps) => (
         <YAxis unit=" Wh"/>
         <Tooltip/>
         <ReferenceLine y={0} stroke="#000"/>
-        <Bar dataKey="gas" name="Gas" fill="#f59e0b" stackId="energy"/>
         <Bar dataKey="electricity" name="General electricity" fill="#3b82f6" stackId="energy"/>
         <Bar dataKey="evCharging" name="EV charging" fill="#ef4444" stackId="energy"/>
         <Bar dataKey="battery" name="Battery" fill="#8b5cf6" stackId="energy"/>

@@ -7,13 +7,9 @@ export type Question = {
 };
 
 export const questions: Question[] = [
-  { id: "hasGas", type: "boolean" },
-  { id: "hasGasHeating", type: "boolean", visible: (values) => values.hasGas === true },
-  { id: "gasCost", type: "number", visible: (values) => values.hasGas === true },
   { id: "hasSolar", type: "boolean" },
   { id: "solar", type: "solar", visible: (values) => values.hasSolar === true },
-  { id: "hasHeatPump", type: "boolean" },
-  { id: "heatPump", type: "heatPump", visible: (values) => values.hasHeatPump === true },
+  { id: "heatPump", type: "heatPump" },
   { id: "hasBatteries", type: "boolean" },
   { id: "battery", type: "battery", visible: (values) => values.hasBatteries === true },
   { id: "hasElectricVehicle", type: "boolean" },

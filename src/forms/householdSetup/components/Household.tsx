@@ -1,11 +1,11 @@
 import {useFormikContext} from "formik";
-import type {Household} from "../schema.ts";
+import {POTENTIAL_SOLAR_PANEL_CAPACITY_KW, type Household} from "../schema.ts";
 import {BooleanField} from "./Boolean.tsx";
 import {NumberField} from "./Number.tsx";
 import {CalculatedField} from "./Calculated.tsx";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 
-const DetailCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
+const DetailCard = ({title, children}: { title: string; children: React.ReactNode }) => (
     <Card className="border-primary/15 bg-muted/30 shadow-none">
         <CardHeader>
             <CardTitle>{title}</CardTitle>
@@ -16,45 +16,44 @@ const DetailCard = ({ title, children }: { title: string; children: React.ReactN
     </Card>
 );
 
-const HouseholdFields = () => {
+export const HouseholdFields = () => {
     const {values} = useFormikContext<Household>();
-    const shouldAskAboutHeatPump = !(values.hasGas && values.hasGasHeating);
-
     return (
         <div className="grid gap-6">
-            <BooleanField name="hasGas" label="Does the household have gas?"/>
-            {values.hasGas ? (
-                <DetailCard title="Gas supply">
-                    <BooleanField name="hasGasHeating" label="Is the gas used for heating?"/>
-                    <NumberField name="gasCost" label="Monthly gas bill" unit="£"/>
-                </DetailCard>
-            ) : null}
-
+            <NumberField name="heatPump.capacityKw" label="Capacity" unit="kW"/>
             <BooleanField name="hasSolar" label="Does the household have solar panels?"/>
-            {values.hasSolar ? (
+            {values.hasSolar === true ? (
                 <DetailCard title="Solar panels">
                     <NumberField name="solar.averageIndividualPanelOutput" label="Average individual panel output"
                                  unit="kW"/>
                     <NumberField name="solar.numberOfPanels" label="Number of panels"/>
-                    <CalculatedField label="Total solar output" value={values.solar.valueOfTotalOutput} unit="kW"/>
+                    <CalculatedField label="Total solar output" value={values.solar?.valueOfTotalOutput} unit="kW"/>
+                </DetailCard>
+            ) : values.hasSolar === false ? (
+                <DetailCard title="Potential solar panels">
+                    <CalculatedField label="Assumed output per panel"
+                                     value={POTENTIAL_SOLAR_PANEL_CAPACITY_KW} unit="kW"/>
+                    <NumberField name="potentialSolar.numberOfPanels" label="Number of panels"/>
+                    <CalculatedField label="Total potential solar output" value={values.potentialSolar.valueOfTotalOutput}
+                                     unit="kW"/>
                 </DetailCard>
             ) : null}
 
-            {shouldAskAboutHeatPump ? <BooleanField name="hasHeatPump" label="Does the household have a heat pump?"/> : null}
-            {shouldAskAboutHeatPump && values.hasHeatPump ? (
-                <DetailCard title="Heat pump">
-                    <NumberField name="heatPump.capacityKw" label="Capacity" unit="kW"/>
-                </DetailCard>
-            ) : null}
 
             <BooleanField name="hasBatteries" label="Does the household have batteries?"/>
             {values.hasBatteries ? (
                 <DetailCard title="Battery storage">
                     <NumberField name="battery.averageBatteryCapacity" label="Average battery capacity" unit="kWh"/>
                     <NumberField name="battery.numberOfBatteries" label="Number of batteries"/>
-                    <CalculatedField label="Total storage" value={values.battery.totalStorage} unit="kWh"/>
+                    <CalculatedField label="Total storage" value={values.battery?.totalStorage} unit="kWh"/>
                 </DetailCard>
-            ) : null}
+            ) : (
+                <DetailCard title="Battery storage">
+                    <NumberField name="battery.averageBatteryCapacity" label="Average battery capacity" unit="kWh"/>
+                    <NumberField name="battery.numberOfBatteries" label="Number of batteries"/>
+                    <CalculatedField label="Total storage" value={values.battery?.totalStorage} unit="kWh"/>
+                </DetailCard>
+            )}
 
             <BooleanField name="hasElectricVehicle" label="Does the household have an electric vehicle?"/>
             {values.hasElectricVehicle ? (
@@ -70,4 +69,3 @@ const HouseholdFields = () => {
         </div>
     );
 };
-export default HouseholdFields
