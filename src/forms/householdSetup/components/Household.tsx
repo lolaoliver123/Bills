@@ -38,7 +38,7 @@ export const HouseholdFields = () => {
                                      value={values.potentialSolar.valueOfTotalOutput}
                                      unit="kW"/>
                 </DetailCard>
-            ) : null}
+            ) : null};
 
 
             <BooleanField name="hasBatteries" label="Does the household have batteries?"/>
@@ -48,13 +48,13 @@ export const HouseholdFields = () => {
                     <NumberField name="battery.numberOfBatteries" label="Number of batteries"/>
                     <CalculatedField label="Total storage" value={values.battery?.totalStorage} unit="kWh"/>
                 </DetailCard>
-            ) : values.hasBatteries == false ? (
+            ) : (values.hasBatteries == false ? (
                 <DetailCard title="Battery storage">
                     <NumberField name="battery.averageBatteryCapacity" label="Average battery capacity" unit="kWh"/>
                     <NumberField name="battery.numberOfBatteries" label="Number of batteries"/>
                     <CalculatedField label="Total storage" value={values.battery?.totalStorage} unit="kWh"/>
                 </DetailCard>
-            ) : null}
+            ) : null)}
 
             <BooleanField name="hasElectricVehicle" label="Does the household have an electric vehicle?"/>
             {values.hasElectricVehicle ? (

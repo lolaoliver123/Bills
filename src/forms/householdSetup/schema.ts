@@ -35,8 +35,7 @@ export type Household = {
     electricVehicle: ElectricVehicle;
 };
 
-export const POTENTIAL_SOLAR_PANEL_CAPACITY_KW = 123;
-export const POTENTIAL_BATTERY_AVERAGE_CAPACITY_KW = 987;
+export const POTENTIAL_SOLAR_PANEL_CAPACITY_KW: number = 123;
 
 const optionalNumber = z.number().optional();
 

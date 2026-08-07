@@ -6,7 +6,11 @@ import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import NetBarChart from "@/components/graph/Graph.tsx";
 import {estimateDailyUsage} from "@/components/graph/tempData.ts";
-import {withPotentialSolar} from "@/forms/householdSetup/householdScenarios.ts";
+import {
+    withPotentialBatteries,
+    withPotentialBatteriesAndSolar,
+    withPotentialSolar
+} from "@/forms/householdSetup/householdScenarios.ts";
 
 const validationErrors = (values: Household): FormikErrors<Household> => {
     const result = schema.safeParse(values);
@@ -35,10 +39,11 @@ const KeepCalculatedFieldsInSync = () => {
             void setFieldValue("battery.totalStorage", calculated.battery.totalStorage, false);
         }
         if (calculated.potentialBattery.totalStorage !== values.potentialBattery.totalStorage) {
-            void setFieldValue("potentialBattery.totalStorage", calculated.battery.totalStorage, false);
+            void setFieldValue("potentialBattery.totalStorage", calculated.potentialBattery.totalStorage, false);
         }
     }, [
         calculated.battery.totalStorage,
+        calculated.potentialBattery.totalStorage,
         calculated.solar.valueOfTotalOutput,
         calculated.potentialSolar.averageIndividualPanelOutput,
         calculated.potentialSolar.valueOfTotalOutput,
@@ -72,7 +77,7 @@ const App = () => {
                             <Form noValidate className="space-y-8">
                                 <KeepCalculatedFieldsInSync/>
                                 <HouseholdFields/>
-                                <Button type="submit" size="lg">Download household.json</Button>
+                                <Button type="submit" size="lg">See how much you could save</Button>
                             </Form>
                         </Formik>
                     </CardContent>
@@ -98,6 +103,30 @@ const App = () => {
                                 </CardHeader>
                                 <CardContent className="overflow-x-auto">
                                     <NetBarChart data={estimateDailyUsage(withPotentialSolar(submittedHousehold))}/>
+                                </CardContent>
+                            </Card>
+                        ) : null}
+                        {submittedHousehold.hasBatteries === false ? (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>With potential batteries</CardTitle>
+                                    <CardDescription>Estimated usage if the household installed the maximum
+                                        number of batteries entered above.</CardDescription>
+                                </CardHeader>
+                                <CardContent className="overflow-x-auto">
+                                    <NetBarChart data={estimateDailyUsage(withPotentialBatteries(submittedHousehold))}/>
+                                </CardContent>
+                            </Card>
+                        ) : null}
+                        {submittedHousehold.hasSolar === false && submittedHousehold.hasBatteries === false ? (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>With potential batteries</CardTitle>
+                                    <CardDescription>Estimated usage if the household installed the maximum
+                                        number of batteries and solar panels entered above.</CardDescription>
+                                </CardHeader>
+                                <CardContent className="overflow-x-auto">
+                                    <NetBarChart data={estimateDailyUsage(withPotentialBatteriesAndSolar(submittedHousehold))}/>
                                 </CardContent>
                             </Card>
                         ) : null}
