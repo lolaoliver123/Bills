@@ -35,7 +35,6 @@ const KeepCalculatedFieldsInSync = () => {
             void setFieldValue("battery.totalStorage", calculated.battery.totalStorage, false);
         }
         if (calculated.potentialBattery.totalStorage !== values.potentialBattery.totalStorage) {
-            void setFieldValue("potentialBattery.averageBatteryCapacity", calculated.potentialBattery.totalStorage, false);
             void setFieldValue("potentialBattery.totalStorage", calculated.battery.totalStorage, false);
         }
     }, [
@@ -45,7 +44,6 @@ const KeepCalculatedFieldsInSync = () => {
         calculated.potentialSolar.valueOfTotalOutput,
         setFieldValue,
         values.battery.totalStorage,
-        values.potentialBattery.averageBatteryCapacity,
         values.potentialBattery.totalStorage,
         values.solar.valueOfTotalOutput,
         values.potentialSolar.valueOfTotalOutput,

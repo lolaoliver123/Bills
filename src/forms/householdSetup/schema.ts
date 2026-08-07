@@ -36,6 +36,7 @@ export type Household = {
 };
 
 export const POTENTIAL_SOLAR_PANEL_CAPACITY_KW = 123;
+export const POTENTIAL_BATTERY_AVERAGE_CAPACITY_KW = 987;
 
 const optionalNumber = z.number().optional();
 
