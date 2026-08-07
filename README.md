@@ -1,75 +1,27 @@
-# React + TypeScript + Vite
+# Spruce household energy comparison
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React and TypeScript prototype for comparing a household's current heat-pump, solar, and battery setup with proposed solar and battery additions.
 
-Currently, two official plugins are available:
+## Data model
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The form uses a UI-only draft for conditional Yes/No questions. On submission it is validated and mapped into a `HouseholdAssessment` with separate `current` and `proposed` energy assets. Solar and battery systems use the same shape in either collection; scenario composition determines whether they are installed or proposed.
 
-## React Compiler
+System totals are derived rather than persisted:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- solar capacity = panel count × panel capacity in kW;
+- battery capacity = unit count × unit capacity in kWh.
 
-## Expanding the ESLint configuration
+Proposed solar currently assumes exactly `123 kW` per panel. This is an explicit prototype assumption.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Calculation limits
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The charts use scaled, illustrative 24-hour profiles. They are not yet a physical battery simulation or a financial savings calculation. Battery state of charge, efficiency, tariffs, grid import/export, weather, and seasonal generation remain future work.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Commands
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sh
+npm run dev
+npm test
+npm run build
+npm run lint
 ```

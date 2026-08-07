@@ -1,65 +1,45 @@
 import * as z from "zod";
 
-export type Solar = {
-    averageIndividualPanelOutput?: number;
-    numberOfPanels?: number;
-    valueOfTotalOutput?: number;
+export type SolarSystem = {
+    panelCount: number;
+    panelCapacityKw: number;
 };
 
-export type Battery = {
-    averageBatteryCapacity?: number;
-    numberOfBatteries?: number;
-    totalStorage?: number;
+export type BatterySystem = {
+    unitCount: number;
+    unitCapacityKwh: number;
 };
 
 export type HeatPump = {
-    capacityKw?: number;
+    capacityKw: number;
 };
 
 export type ElectricVehicle = {
-    batteryCapacity?: number;
-    numberOfTotalChargesPerWeek?: number;
-    isVoltageToGrid?: boolean;
+    batteryCapacityKwh: number;
+    chargesPerWeek: number;
+    canSupplyGrid: boolean;
 };
 
-export type Household = {
-    hasSolar?: boolean;
+export type EnergyAssets = {
+    solar?: SolarSystem;
+    battery?: BatterySystem;
+};
+
+export type HouseholdProfile = {
     heatPump: HeatPump;
-    hasBatteries?: boolean;
-    hasElectricVehicle?: boolean;
-    electricCost?: number;
-    solar: Solar;
-    potentialSolar: Solar;
-    battery: Battery;
-    potentialBattery: Battery;
-    electricVehicle: ElectricVehicle;
+    electricVehicle?: ElectricVehicle;
+    monthlyElectricityCost: number;
 };
 
-export const POTENTIAL_SOLAR_PANEL_CAPACITY_KW: number = 123;
+export type HouseholdAssessment = {
+    household: HouseholdProfile;
+    current: EnergyAssets;
+    proposed: EnergyAssets;
+};
+
+export const PROPOSED_SOLAR_PANEL_CAPACITY_KW = 123;
 
 const optionalNumber = z.number().optional();
-
-const solarSchema = z.object({
-    averageIndividualPanelOutput: optionalNumber,
-    numberOfPanels: optionalNumber,
-    valueOfTotalOutput: optionalNumber,
-});
-
-const batterySchema = z.object({
-    averageBatteryCapacity: optionalNumber,
-    numberOfBatteries: optionalNumber,
-    totalStorage: optionalNumber,
-});
-
-const heatPumpSchema = z.object({
-    capacityKw: optionalNumber,
-});
-
-const electricVehicleSchema = z.object({
-    batteryCapacity: optionalNumber,
-    numberOfTotalChargesPerWeek: optionalNumber,
-    isVoltageToGrid: z.boolean().optional(),
-});
 
 const required = (ctx: z.RefinementCtx, path: (string | number)[], message = "This field is required") => {
     ctx.addIssue({code: "custom", path, message});
@@ -77,109 +57,99 @@ const requirePositiveInteger = (ctx: z.RefinementCtx, value: number | undefined,
     }
 };
 
-export const schema = z
-    .object({
-        hasSolar: z.boolean().optional(),
-        hasBatteries: z.boolean().optional(),
-        hasElectricVehicle: z.boolean().optional(),
-        electricCost: optionalNumber,
-        solar: solarSchema,
-        potentialSolar: solarSchema,
-        battery: batterySchema,
-        heatPump: heatPumpSchema,
-        electricVehicle: electricVehicleSchema,
-    })
-    .superRefine((data, ctx) => {
-        (["hasSolar", "hasBatteries", "hasElectricVehicle"] as const).forEach((field) => {
-            if (data[field] === undefined) required(ctx, [field], "Please choose yes or no");
-        });
-
-        requirePositive(ctx, data.electricCost, ["electricCost"]);
-
-        if (data.hasSolar) {
-            requirePositive(ctx, data.solar.averageIndividualPanelOutput, ["solar", "averageIndividualPanelOutput"]);
-            requirePositiveInteger(ctx, data.solar.numberOfPanels, ["solar", "numberOfPanels"]);
-        } else if (data.hasSolar === false) {
-            requirePositiveInteger(ctx, data.potentialSolar.numberOfPanels, ["potentialSolar", "numberOfPanels"]);
-        }
-
-        if (data.hasBatteries) {
-            requirePositive(ctx, data.battery.averageBatteryCapacity, ["battery", "averageBatteryCapacity"]);
-            requirePositiveInteger(ctx, data.battery.numberOfBatteries, ["battery", "numberOfBatteries"]);
-        }
-
-        requirePositive(ctx, data.heatPump.capacityKw, ["heatPump", "capacityKw"]);
-
-        if (data.hasElectricVehicle) {
-            requirePositive(ctx, data.electricVehicle.batteryCapacity, ["electricVehicle", "batteryCapacity"]);
-            requirePositive(ctx, data.electricVehicle.numberOfTotalChargesPerWeek, ["electricVehicle", "numberOfTotalChargesPerWeek"]);
-            if (data.electricVehicle.isVoltageToGrid === undefined) {
-                required(ctx, ["electricVehicle", "isVoltageToGrid"], "Please choose yes or no");
-            }
-        }
+export const householdFormSchema = z.object({
+    hasSolar: z.boolean().optional(),
+    hasBatteries: z.boolean().optional(),
+    hasElectricVehicle: z.boolean().optional(),
+    monthlyElectricityCost: optionalNumber,
+    heatPump: z.object({capacityKw: optionalNumber}),
+    solar: z.object({panelCount: optionalNumber, panelCapacityKw: optionalNumber}),
+    battery: z.object({unitCount: optionalNumber, unitCapacityKwh: optionalNumber}),
+    electricVehicle: z.object({
+        batteryCapacityKwh: optionalNumber,
+        chargesPerWeek: optionalNumber,
+        canSupplyGrid: z.boolean().optional(),
+    }),
+}).superRefine((data, ctx) => {
+    (["hasSolar", "hasBatteries", "hasElectricVehicle"] as const).forEach((field) => {
+        if (data[field] === undefined) required(ctx, [field], "Please choose yes or no");
     });
 
-export const initialValues: Household = {
+    requirePositive(ctx, data.monthlyElectricityCost, ["monthlyElectricityCost"]);
+    requirePositive(ctx, data.heatPump.capacityKw, ["heatPump", "capacityKw"]);
+
+    if (data.hasSolar !== undefined) {
+        requirePositiveInteger(ctx, data.solar.panelCount, ["solar", "panelCount"]);
+        if (data.hasSolar) requirePositive(ctx, data.solar.panelCapacityKw, ["solar", "panelCapacityKw"]);
+    }
+
+    if (data.hasBatteries !== undefined) {
+        requirePositiveInteger(ctx, data.battery.unitCount, ["battery", "unitCount"]);
+        requirePositive(ctx, data.battery.unitCapacityKwh, ["battery", "unitCapacityKwh"]);
+    }
+
+    if (data.hasElectricVehicle) {
+        requirePositive(ctx, data.electricVehicle.batteryCapacityKwh, ["electricVehicle", "batteryCapacityKwh"]);
+        requirePositive(ctx, data.electricVehicle.chargesPerWeek, ["electricVehicle", "chargesPerWeek"]);
+        if (data.electricVehicle.canSupplyGrid === undefined) {
+            required(ctx, ["electricVehicle", "canSupplyGrid"], "Please choose yes or no");
+        }
+    }
+});
+
+export type HouseholdFormDraft = z.infer<typeof householdFormSchema>;
+
+export const initialValues: HouseholdFormDraft = {
     hasSolar: undefined,
     hasBatteries: undefined,
     hasElectricVehicle: undefined,
-    electricCost: undefined,
-    solar: {
-        averageIndividualPanelOutput: undefined,
-        numberOfPanels: undefined,
-        valueOfTotalOutput: undefined,
-    },
-    battery: {
-        averageBatteryCapacity: undefined,
-        numberOfBatteries: undefined,
-        totalStorage: undefined,
-    },
-    potentialSolar: {
-        averageIndividualPanelOutput: undefined,
-        numberOfPanels: undefined,
-        valueOfTotalOutput: undefined,
-    },
-    potentialBattery: {
-        averageBatteryCapacity: undefined,
-        numberOfBatteries: undefined,
-        totalStorage: undefined,
-    },
+    monthlyElectricityCost: undefined,
     heatPump: {capacityKw: undefined},
+    solar: {panelCount: undefined, panelCapacityKw: undefined},
+    battery: {unitCount: undefined, unitCapacityKwh: undefined},
     electricVehicle: {
-        batteryCapacity: undefined,
-        numberOfTotalChargesPerWeek: undefined,
-        isVoltageToGrid: undefined,
+        batteryCapacityKwh: undefined,
+        chargesPerWeek: undefined,
+        canSupplyGrid: undefined,
     },
 };
 
-export const withCalculatedFields = (values: Household): Household => {
-    const solarOutput =
-        values.solar?.averageIndividualPanelOutput !== undefined && values.solar?.numberOfPanels !== undefined
-            ? values.solar.averageIndividualPanelOutput * values.solar.numberOfPanels
-            : undefined;
-    const potentialSolarOutput =
-        values.hasSolar === false && values.potentialSolar.numberOfPanels !== undefined
-            ? POTENTIAL_SOLAR_PANEL_CAPACITY_KW * values.potentialSolar.numberOfPanels
-            : undefined;
-    const totalStorage =
-        values.battery?.averageBatteryCapacity !== undefined && values.battery?.numberOfBatteries !== undefined
-            ? values.battery.averageBatteryCapacity * values.battery.numberOfBatteries
-            : undefined;
-    const potentialTotalStorage =
-        values.potentialBattery?.averageBatteryCapacity !== undefined && values.potentialBattery?.numberOfBatteries !== undefined
-            ? values.potentialBattery.averageBatteryCapacity * values.potentialBattery.numberOfBatteries
-            : undefined;
+export const getSolarCapacityKw = (system: SolarSystem): number =>
+    system.panelCount * system.panelCapacityKw;
+
+export const getBatteryCapacityKwh = (system: BatterySystem): number =>
+    system.unitCount * system.unitCapacityKwh;
+
+export const toHouseholdAssessment = (draft: HouseholdFormDraft): HouseholdAssessment => {
+    const parsed = householdFormSchema.parse(draft);
+    const solar: SolarSystem = {
+        panelCount: parsed.solar.panelCount!,
+        panelCapacityKw: parsed.hasSolar
+            ? parsed.solar.panelCapacityKw!
+            : PROPOSED_SOLAR_PANEL_CAPACITY_KW,
+    };
+    const battery: BatterySystem = {
+        unitCount: parsed.battery.unitCount!,
+        unitCapacityKwh: parsed.battery.unitCapacityKwh!,
+    };
+
     return {
-        ...values,
-        solar: {...values.solar, valueOfTotalOutput: solarOutput},
-        potentialSolar: {
-            ...values.potentialSolar,
-            averageIndividualPanelOutput: values.hasSolar === false
-                ? POTENTIAL_SOLAR_PANEL_CAPACITY_KW
-                : values.potentialSolar.averageIndividualPanelOutput,
-            valueOfTotalOutput: potentialSolarOutput,
+        household: {
+            heatPump: {capacityKw: parsed.heatPump.capacityKw!},
+            monthlyElectricityCost: parsed.monthlyElectricityCost!,
+            electricVehicle: parsed.hasElectricVehicle ? {
+                batteryCapacityKwh: parsed.electricVehicle.batteryCapacityKwh!,
+                chargesPerWeek: parsed.electricVehicle.chargesPerWeek!,
+                canSupplyGrid: parsed.electricVehicle.canSupplyGrid!,
+            } : undefined,
         },
-        battery: {...values.battery, totalStorage: totalStorage},
-        potentialBattery: {...values.potentialBattery, totalStorage: potentialTotalStorage},
+        current: {
+            solar: parsed.hasSolar ? solar : undefined,
+            battery: parsed.hasBatteries ? battery : undefined,
+        },
+        proposed: {
+            solar: parsed.hasSolar === false ? solar : undefined,
+            battery: parsed.hasBatteries === false ? battery : undefined,
+        },
     };
 };

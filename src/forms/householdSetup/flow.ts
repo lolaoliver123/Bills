@@ -1,9 +1,9 @@
-import type { Household } from "./schema";
+import type {HouseholdFormDraft} from "./schema";
 
 export type Question = {
   id: string;
   type: "boolean" | "number" | "solar" | "battery" | "heatPump" | "electricVehicle";
-  visible?: (values: Household) => boolean;
+  visible?: (values: HouseholdFormDraft) => boolean;
 };
 
 export const questions: Question[] = [
