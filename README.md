@@ -13,9 +13,25 @@ System totals are derived rather than persisted:
 
 Proposed solar currently assumes exactly `123 kW` per panel. This is an explicit prototype assumption.
 
+## Daily simulation
+
+The calculator runs a sequential, one-hour-step simulation over an illustrative day. Household electricity excludes battery charging in the chart. Solar serves the household first, while battery charging and discharging are displayed as separate flows.
+
+Battery dispatch uses these fixed assumptions per unit:
+
+- 5 kW maximum charge and discharge power;
+- 95% charging efficiency and 95% discharging efficiency;
+- 10% minimum reserve and starting state of charge;
+- grid charging from 00:00–05:00 to a 50% state-of-charge target;
+- charging from surplus solar outside the peak period, up to full capacity;
+- discharge from 16:00–19:00, serving the household before exporting remaining permitted energy;
+- no simultaneous battery charging and discharging during the peak period.
+
+Grid import/export and battery state of charge are calculated internally even though the chart currently focuses on electricity, solar, battery charging, and battery discharging.
+
 ## Calculation limits
 
-The charts use scaled, illustrative 24-hour profiles. They are not yet a physical battery simulation or a financial savings calculation. Battery state of charge, efficiency, tariffs, grid import/export, weather, and seasonal generation remain future work.
+Demand, EV, heat-pump, and solar profiles remain illustrative. The simulation does not yet use tariff prices, annualisation, weather, seasonal generation, or calculate financial savings.
 
 ## Commands
 

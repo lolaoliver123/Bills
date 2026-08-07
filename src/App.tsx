@@ -11,7 +11,7 @@ import {HouseholdFields} from "./forms/householdSetup/components/Household.tsx";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import NetBarChart from "@/components/graph/Graph.tsx";
-import {estimateDailyUsage} from "@/components/graph/tempData.ts";
+import {simulateDailyEnergy} from "@/components/graph/simulation.ts";
 import {buildHouseholdScenarios} from "@/forms/householdSetup/householdScenarios.ts";
 
 const validationErrors = (values: HouseholdFormDraft): FormikErrors<HouseholdFormDraft> => {
@@ -56,7 +56,7 @@ const App = () => {
                                     <CardDescription>{scenario.description}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="overflow-x-auto">
-                                    <NetBarChart data={estimateDailyUsage(scenario)}/>
+                                    <NetBarChart data={simulateDailyEnergy(scenario)}/>
                                 </CardContent>
                             </Card>
                         ))}
