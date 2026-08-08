@@ -1,12 +1,19 @@
 import {describe, expect, it} from "vitest";
 import {
-    buildFinancialComparison,
-    calculateBill,
-    calibrateDemandScale,
-    DEFAULT_ELECTRICITY_TARIFF,
-} from "../../../../src/features/household-energy-comparison/calculations/billing";
-import {simulateDailyEnergy, type HourlyEnergyFlow} from "../../../../src/features/household-energy-comparison/calculations/simulation";
+    simulateDailyEnergy,
+    type HourlyEnergyFlow
+} from "../../../../src/features/household-energy-comparison/calculations/simulation";
 import type {HouseholdScenario} from "../../../../src/features/household-energy-comparison/models/householdScenarios";
+import {calculateBill} from "../../../../src/features/household-energy-comparison/calculations/billing/calculateBill";
+import {
+    DEFAULT_ELECTRICITY_TARIFF
+} from "../../../../src/features/household-energy-comparison/calculations/billing/config";
+import {
+    calibrateDemandScale
+} from "../../../../src/features/household-energy-comparison/calculations/billing/calibrateDemandScale";
+import {
+    buildFinancialComparison
+} from "../../../../src/features/household-energy-comparison/calculations/billing/buildFinancialComparison";
 
 const scenario = (overrides: Partial<HouseholdScenario> = {}): HouseholdScenario => ({
     id: "current",

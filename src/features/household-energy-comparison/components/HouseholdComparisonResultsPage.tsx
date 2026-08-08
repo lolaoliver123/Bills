@@ -2,9 +2,11 @@ import {ArrowLeft} from "lucide-react";
 import {Navigate, useNavigate} from "react-router-dom";
 import {Button} from "@/components/ui/button";
 import {useHouseholdEnergyComparison} from "../context";
-import {buildFinancialComparison} from "@/features/household-energy-comparison/calculations/billing";
 import {buildHouseholdScenarios} from "@/features/household-energy-comparison/models/householdScenarios";
 import {ComparisonResults} from "./ComparisonResults";
+import {
+    buildFinancialComparison
+} from "@/features/household-energy-comparison/calculations/billing/buildFinancialComparison.ts";
 
 export const HouseholdComparisonResultsPage = () => {
     const navigate = useNavigate();
