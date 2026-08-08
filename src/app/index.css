@@ -21,6 +21,12 @@
     --color-chart-3: var(--chart-3);
     --color-chart-2: var(--chart-2);
     --color-chart-1: var(--chart-1);
+    --color-chart-heat-pump: var(--chart-heat-pump);
+    --color-chart-battery: var(--chart-battery);
+    --color-chart-solar: var(--chart-solar);
+    --color-chart-electricity: var(--chart-electricity);
+    --color-action: var(--action);
+    --color-question: var(--question);
     --color-ring: var(--ring);
     --color-input: var(--input);
     --color-border: var(--border);
@@ -72,6 +78,12 @@
     --chart-3: oklch(0.439 0 0);
     --chart-4: oklch(0.371 0 0);
     --chart-5: oklch(0.269 0 0);
+    --question: #227858;
+    --action: #79db8e;
+    --chart-electricity: #3D8BF2;
+    --chart-solar: #F2BB16;
+    --chart-battery: #9857F2;
+    --chart-heat-pump: #F26716;
     --radius: 0.625rem;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);

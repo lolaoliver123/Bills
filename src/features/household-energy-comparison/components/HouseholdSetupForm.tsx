@@ -23,14 +23,17 @@ export const HouseholdSetupForm = ({initialValues, onSubmit}: {
 }) => (
     <Card className="mx-auto max-w-2xl">
         <CardHeader className="gap-2">
-            <CardTitle className="text-2xl sm:text-3xl">Household setup</CardTitle>
-            <CardDescription>Tell us about the household’s energy equipment and monthly bills.</CardDescription>
+            <CardTitle className="text-2xl sm:text-3xl ">Solar and Battery Savings Calculator</CardTitle>
+            <CardDescription>Tell us about this household’s energy equipment and monthly bills.</CardDescription>
         </CardHeader>
         <CardContent>
             <Formik initialValues={initialValues} validate={validationErrors} onSubmit={onSubmit}>
                 <Form noValidate className="space-y-8">
                     <HouseholdFields/>
-                    <Button type="submit" size="lg">See how much you could save</Button>
+                    <Button type="submit" size="lg"
+                            className="bg-[#79db8e] text-slate-950 hover:bg-[#79db8e]/80">
+                        See how much you could save
+                    </Button>
                 </Form>
             </Formik>
         </CardContent>

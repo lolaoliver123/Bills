@@ -13,6 +13,7 @@ export const scenario = (overrides: Partial<HouseholdScenario> = {}): HouseholdS
 export const flow = (hour: number, gridImportKwh: number, gridExportKwh: number): HourlyEnergyFlow => ({
     hour,
     electricityDemandKwh: 0,
+    heatPumpDemandKwh: 0,
     solarGenerationKwh: 0,
     batteryChargeKwh: 0,
     batteryDischargeKwh: 0,

@@ -35,6 +35,7 @@ export const simulateDailyEnergy = (
     let stateOfChargeKwh = reserveKwh;
 
     return GENERAL_ELECTRICITY_WH.map((generalElectricityWh, hour) => {
+        const heatPumpDemandKwh = whToKwh(HEAT_PUMP_ELECTRICITY_WH[hour] * heatPumpRatio) * demandScale;
         const electricityDemandKwh = whToKwh(
             generalElectricityWh +
             HEAT_PUMP_ELECTRICITY_WH[hour] * heatPumpRatio +
@@ -97,6 +98,7 @@ export const simulateDailyEnergy = (
         return {
             hour,
             electricityDemandKwh,
+            heatPumpDemandKwh,
             solarGenerationKwh,
             batteryChargeKwh,
             batteryDischargeKwh,

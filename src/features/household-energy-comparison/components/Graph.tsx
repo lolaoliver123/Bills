@@ -8,7 +8,8 @@ type NetBarChartProps = {
 export const NetBarChart = ({data}: NetBarChartProps) => {
     const chartData = data.map((flow) => ({
         hour: flow.hour,
-        electricity: flow.electricityDemandKwh,
+        electricity: Math.max(0, flow.electricityDemandKwh - flow.heatPumpDemandKwh),
+        heatPump: flow.heatPumpDemandKwh,
         solar: -flow.solarGenerationKwh,
         batteryCharge: flow.batteryChargeKwh,
         batteryDischarge: -flow.batteryDischargeKwh,
@@ -24,10 +25,11 @@ export const NetBarChart = ({data}: NetBarChartProps) => {
             <YAxis unit=" kWh"/>
             <Tooltip/>
             <ReferenceLine y={0} stroke="#000"/>
-            <Bar dataKey="electricity" name="Electricity demand" fill="#3b82f6" stackId="energy"/>
-            <Bar dataKey="batteryCharge" name="Battery charging" fill="#f59e0b" stackId="energy"/>
-            <Bar dataKey="batteryDischarge" name="Battery discharging" fill="#8b5cf6" stackId="energy"/>
-            <Bar dataKey="solar" name="Solar generation" fill="#22c55e" stackId="energy"/>
+            <Bar dataKey="electricity" name="Electricity demand" fill="var(--chart-electricity)" stackId="energy"/>
+            <Bar dataKey="heatPump" name="Heat pump demand" fill="var(--chart-heat-pump)" stackId="energy"/>
+            <Bar dataKey="batteryCharge" name="Battery charging" fill="var(--chart-battery)" stackId="energy"/>
+            <Bar dataKey="batteryDischarge" name="Battery discharging" fill="var(--chart-battery)" stackId="energy"/>
+            <Bar dataKey="solar" name="Solar generation" fill="var(--chart-solar)" stackId="energy"/>
         </BarChart>
     );
 };

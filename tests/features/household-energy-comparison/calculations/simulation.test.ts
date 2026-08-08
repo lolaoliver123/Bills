@@ -19,6 +19,15 @@ const scenario = (assets: HouseholdScenario["assets"]): HouseholdScenario => ({
 const battery = {unitCount: 1, unitCapacityKwh: 13.5};
 
 describe("daily energy simulation", () => {
+    it("reports heat-pump demand separately while retaining it in total demand", () => {
+        const result = simulateDailyEnergy(scenario({}));
+
+        expect(result.some(({heatPumpDemandKwh}) => heatPumpDemandKwh > 0)).toBe(true);
+        for (const hour of result) {
+            expect(hour.electricityDemandKwh).toBeGreaterThanOrEqual(hour.heatPumpDemandKwh);
+        }
+    });
+
     it("does not dispatch storage when no battery is installed", () => {
         const result = simulateDailyEnergy(scenario({solar: {panelCount: 12, panelCapacityKw: 0.4}}));
 

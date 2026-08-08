@@ -9,7 +9,7 @@ export const BooleanField = ({ name, label }: { name: string; label: string }) =
 
     return (
         <fieldset className="space-y-2">
-            <legend className="text-sm leading-none font-medium">{label}</legend>
+            <legend className="text-question text-sm leading-none font-medium">{label}</legend>
             <RadioGroup
                 value={field.value === undefined ? "" : String(field.value)}
                 onValueChange={(value) => {
@@ -21,11 +21,13 @@ export const BooleanField = ({ name, label }: { name: string; label: string }) =
                 className="flex gap-6"
             >
                 <div className="flex items-center gap-2">
-                    <RadioGroupItem id={`${inputId}-yes`} value="true" />
+                    <RadioGroupItem id={`${inputId}-yes`} value="true"
+                                    className="border-action data-checked:border-action data-checked:bg-action" />
                     <Label htmlFor={`${inputId}-yes`} className="font-normal">Yes</Label>
                 </div>
                 <div className="flex items-center gap-2">
-                    <RadioGroupItem id={`${inputId}-no`} value="false" />
+                    <RadioGroupItem id={`${inputId}-no`} value="false"
+                                    className="border-action data-checked:border-action data-checked:bg-action" />
                     <Label htmlFor={`${inputId}-no`} className="font-normal">No</Label>
                 </div>
             </RadioGroup>

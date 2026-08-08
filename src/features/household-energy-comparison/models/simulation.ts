@@ -1,6 +1,7 @@
 export type HourlyEnergyFlow = {
     hour: number;
     electricityDemandKwh: number;
+    heatPumpDemandKwh: number;
     solarGenerationKwh: number;
     batteryChargeKwh: number;
     batteryDischargeKwh: number;

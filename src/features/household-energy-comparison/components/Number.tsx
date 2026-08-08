@@ -7,7 +7,7 @@ export const NumberField = ({ name, label, unit }: { name: string; label: string
 
     return (
         <div className="space-y-2">
-            <Label htmlFor={name}>{label}</Label>
+            <Label htmlFor={name} className="text-question">{label}</Label>
             <div className="relative max-w-xs">
                 <Input
                     id={name}
