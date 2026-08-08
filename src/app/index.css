@@ -26,6 +26,8 @@
   --color-chart-battery: var(--chart-battery);
   --color-chart-solar: var(--chart-solar);
   --color-chart-electricity: var(--chart-electricity);
+  --color-chart-cheap-window: var(--chart-cheap-window);
+  --color-chart-peak-window: var(--chart-peak-window);
   --color-action: var(--action);
   --color-question: var(--question);
   --color-ring: var(--ring);
@@ -86,6 +88,8 @@
   --chart-battery: #9857f2;
   --chart-heat-pump: #f26716;
   --chart-ev: #2dd5c0;
+  --chart-cheap-window: #79db8e;
+  --chart-peak-window: #f26716;
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);

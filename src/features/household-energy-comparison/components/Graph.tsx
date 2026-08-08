@@ -1,9 +1,21 @@
-import { Bar, BarChart, CartesianGrid, ReferenceLine, Tooltip, XAxis, YAxis } from 'recharts'
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ReferenceArea,
+  ReferenceLine,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
 import type { HourlyEnergyFlow } from 'features/household-energy-comparison/models/simulation'
+import { BATTERY_ASSUMPTIONS } from 'features/household-energy-comparison/calculations/simulation/config'
 
 type NetBarChartProps = {
   data: HourlyEnergyFlow[]
 }
+
+const HOUR_TICKS = Array.from({ length: 6 }, (_, index) => index * 4)
 
 export const NetBarChart = ({ data }: NetBarChartProps) => {
   const chartData = data.map((flow) => ({
@@ -26,18 +38,50 @@ export const NetBarChart = ({ data }: NetBarChartProps) => {
       height={600}
       data={chartData}
       stackOffset="sign"
-      margin={{ top: 20, right: 30, left: 30, bottom: 5 }}
+      margin={{ top: 36, right: 32, left: 32, bottom: 20 }}
     >
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis
         dataKey="hour"
         type="number"
-        domain={[(dataMin) => dataMin - 0.5, (dataMax) => dataMax + 0.5]}
-        tickCount={24}
+        domain={[-0.5, 23.5]}
+        ticks={HOUR_TICKS}
+        interval={0}
+        height={42}
+        tickMargin={10}
+        allowDecimals={false}
         tickFormatter={(hour) => `${String(hour).padStart(2, '0')}:00`}
       />
       <YAxis unit=" kWh" />
       <Tooltip />
+      <ReferenceArea
+        x1={BATTERY_ASSUMPTIONS.cheapStartHour - 0.5}
+        x2={BATTERY_ASSUMPTIONS.cheapEndHour - 0.5}
+        fill="var(--chart-cheap-window)"
+        fillOpacity={0.16}
+        strokeOpacity={0}
+        label={{
+          value: 'Cheap hours',
+          position: 'insideTop',
+          fill: 'var(--question)',
+          fontWeight: 600,
+          fontSize: 12,
+        }}
+      />
+      <ReferenceArea
+        x1={BATTERY_ASSUMPTIONS.peakStartHour - 0.5}
+        x2={BATTERY_ASSUMPTIONS.peakEndHour - 0.5}
+        fill="var(--chart-peak-window)"
+        fillOpacity={0.13}
+        strokeOpacity={0}
+        label={{
+          value: 'Peak hours',
+          position: 'insideTop',
+          fill: 'var(--chart-peak-window)',
+          fontWeight: 600,
+          fontSize: 12,
+        }}
+      />
       <ReferenceLine y={0} stroke="#000" />
       <Bar
         dataKey="heatPump"
