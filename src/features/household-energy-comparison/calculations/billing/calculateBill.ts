@@ -1,4 +1,4 @@
-import {type HourlyEnergyFlow} from "../simulation.ts";
+import {type HourlyEnergyFlow} from "../simulation/simulation.ts";
 import type {
     BillEstimate,
     PeriodBill

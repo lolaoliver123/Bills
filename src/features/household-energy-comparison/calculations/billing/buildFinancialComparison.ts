@@ -1,6 +1,6 @@
 import type {HouseholdScenario} from "@/features/household-energy-comparison/models/householdScenarios.ts";
 import type {CalibrationError, FinancialComparison} from "@/features/household-energy-comparison/models/billing.ts";
-import {simulateDailyEnergy} from "@/features/household-energy-comparison/calculations/simulation.ts";
+import {simulateDailyEnergy} from "@/features/household-energy-comparison/calculations/simulation/simulation.ts";
 import {
     calculateBill
 } from "@/features/household-energy-comparison/calculations/billing/calculateBill.ts";

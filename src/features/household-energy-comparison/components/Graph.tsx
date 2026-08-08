@@ -1,5 +1,5 @@
 import {Bar, BarChart, CartesianGrid, ReferenceLine, Tooltip, XAxis, YAxis} from "recharts";
-import type {HourlyEnergyFlow} from "@/features/household-energy-comparison/calculations/simulation.ts";
+import type {HourlyEnergyFlow} from "@/features/household-energy-comparison/calculations/simulation/simulation.ts";
 
 type NetBarChartProps = {
     data: HourlyEnergyFlow[];

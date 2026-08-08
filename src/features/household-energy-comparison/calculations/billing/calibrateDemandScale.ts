@@ -1,12 +1,13 @@
 import type {HouseholdScenario} from "@/features/household-energy-comparison/models/householdScenarios.ts";
 import {calculateBill} from "@/features/household-energy-comparison/calculations/billing/calculateBill.ts";
 import type {CalibrationError, ElectricityTariff} from "@/features/household-energy-comparison/models/billing.ts";
-import {simulateDailyEnergy} from "@/features/household-energy-comparison/calculations/simulation.ts";
-import {DEFAULT_ELECTRICITY_TARIFF} from "@/features/household-energy-comparison/calculations/billing/config.ts";
+import {simulateDailyEnergy} from "@/features/household-energy-comparison/calculations/simulation/simulation.ts";
+import {
+    CALIBRATION_ITERATIONS,
+    CALIBRATION_TOLERANCE_GBP,
+    DEFAULT_ELECTRICITY_TARIFF, MAX_DEMAND_SCALE
+} from "@/features/household-energy-comparison/calculations/billing/config.ts";
 
-const CALIBRATION_TOLERANCE_GBP = 0.0001;
-const CALIBRATION_ITERATIONS = 60;
-const MAX_DEMAND_SCALE = 1024;
 
 const monthlySupplierBillAtScale = (
     scenario: HouseholdScenario,

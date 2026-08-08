@@ -1,56 +1,14 @@
-import {getBatteryCapacityKwh, getSolarCapacityKw} from "@/features/household-energy-comparison/models/schema";
-import type {HouseholdScenario} from "@/features/household-energy-comparison/models/householdScenarios";
+import {getBatteryCapacityKwh, getSolarCapacityKw} from "@/features/household-energy-comparison/models/schema.ts";
+import type {HouseholdScenario} from "@/features/household-energy-comparison/models/householdScenarios.ts";
+import {
+    BATTERY_ASSUMPTIONS, EV_CHARGING_WH,
+    GENERAL_ELECTRICITY_WH,
+    HEAT_PUMP_ELECTRICITY_WH, REFERENCE_EV_CAPACITY_KWH, REFERENCE_EV_CHARGES_PER_WEEK, REFERENCE_HEAT_PUMP_KW,
+    REFERENCE_SOLAR_GENERATION_WH,
+    REFERENCE_SOLAR_KW
+} from "@/features/household-energy-comparison/calculations/simulation/config.ts";
+import type {HourlyEnergyFlow, SimulationOptions} from "@/features/household-energy-comparison/models/simulation.ts";
 
-export type HourlyEnergyFlow = {
-    hour: number;
-    electricityDemandKwh: number;
-    solarGenerationKwh: number;
-    batteryChargeKwh: number;
-    batteryDischargeKwh: number;
-    gridImportKwh: number;
-    gridExportKwh: number;
-    batteryStateOfChargeKwh: number;
-};
-
-export type SimulationOptions = {
-    demandScale?: number;
-};
-
-export const BATTERY_ASSUMPTIONS = {
-    maxChargeKwPerUnit: 5,
-    maxDischargeKwPerUnit: 5,
-    chargeEfficiency: 0.95,
-    dischargeEfficiency: 0.95,
-    reserveFraction: 0.1,
-    cheapChargeTargetFraction: 0.5,
-    cheapStartHour: 0,
-    cheapEndHour: 5,
-    peakStartHour: 16,
-    peakEndHour: 19,
-} as const;
-
-const REFERENCE_SOLAR_KW = 4.8;
-const REFERENCE_HEAT_PUMP_KW = 8;
-const REFERENCE_EV_CAPACITY_KWH = 50;
-const REFERENCE_EV_CHARGES_PER_WEEK = 2;
-
-// Representative energy consumed during each one-hour interval, in Wh.
-const GENERAL_ELECTRICITY_WH = [
-    160, 140, 130, 130, 140, 180, 420, 520, 380, 250, 220, 230,
-    300, 280, 230, 240, 300, 520, 680, 720, 560, 380, 240, 180,
-];
-const HEAT_PUMP_ELECTRICITY_WH = [
-    220, 200, 190, 180, 200, 300, 620, 760, 520, 300, 220, 180,
-    170, 170, 180, 220, 300, 520, 760, 880, 720, 500, 340, 260,
-];
-const REFERENCE_SOLAR_GENERATION_WH = [
-    0, 0, 0, 0, 0, 0, 0, 0, 120, 360, 620, 850,
-    980, 900, 700, 460, 220, 60, 0, 0, 0, 0, 0, 0,
-];
-const EV_CHARGING_WH = [
-    3570, 3570, 3570, 3570, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-];
 
 const whToKwh = (value: number): number => value / 1000;
 const isCheapHour = (hour: number): boolean =>
@@ -66,7 +24,7 @@ export const simulateDailyEnergy = (
     const heatPumpRatio = household.heatPump.capacityKw / REFERENCE_HEAT_PUMP_KW;
     const evRatio = household.electricVehicle
         ? (household.electricVehicle.batteryCapacityKwh * household.electricVehicle.chargesPerWeek) /
-          (REFERENCE_EV_CAPACITY_KWH * REFERENCE_EV_CHARGES_PER_WEEK)
+        (REFERENCE_EV_CAPACITY_KWH * REFERENCE_EV_CHARGES_PER_WEEK)
         : 0;
 
     const batteryCapacityKwh = assets.battery ? getBatteryCapacityKwh(assets.battery) : 0;
