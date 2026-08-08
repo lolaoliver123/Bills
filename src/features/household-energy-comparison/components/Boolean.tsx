@@ -8,8 +8,8 @@ export const BooleanField = ({ name, label }: { name: string; label: string }) =
     const errorId = `${inputId}-error`;
 
     return (
-        <div className="space-y-2">
-            <Label>{label}</Label>
+        <fieldset className="space-y-2">
+            <legend className="text-sm leading-none font-medium">{label}</legend>
             <RadioGroup
                 value={field.value === undefined ? "" : String(field.value)}
                 onValueChange={(value) => {
@@ -30,6 +30,6 @@ export const BooleanField = ({ name, label }: { name: string; label: string }) =
                 </div>
             </RadioGroup>
             {meta.touched && meta.error ? <p id={errorId} className="text-sm text-destructive">{meta.error}</p> : null}
-        </div>
+        </fieldset>
     );
 };
