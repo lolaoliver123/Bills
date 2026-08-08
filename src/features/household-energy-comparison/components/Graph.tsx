@@ -5,7 +5,7 @@ type NetBarChartProps = {
     data: HourlyEnergyFlow[];
 };
 
-const NetBarChart = ({data}: NetBarChartProps) => {
+export const NetBarChart = ({data}: NetBarChartProps) => {
     const chartData = data.map((flow) => ({
         hour: flow.hour,
         electricity: flow.electricityDemandKwh,
@@ -31,5 +31,3 @@ const NetBarChart = ({data}: NetBarChartProps) => {
         </BarChart>
     );
 };
-
-export default NetBarChart;
