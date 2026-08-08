@@ -37,7 +37,7 @@ export type HouseholdAssessment = {
     proposed: EnergyAssets;
 };
 
-export const PROPOSED_SOLAR_PANEL_CAPACITY_KW = 123;
+export const PROPOSED_SOLAR_PANEL_CAPACITY_KW = 0.4;
 
 const optionalNumber = z.number().optional();
 

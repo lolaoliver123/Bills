@@ -21,6 +21,10 @@ const draft = (overrides: Partial<HouseholdFormDraft> = {}): HouseholdFormDraft 
 });
 
 describe("equipment capacity", () => {
+    it("uses a realistic 0.4 kW capacity for each proposed panel", () => {
+        expect(PROPOSED_SOLAR_PANEL_CAPACITY_KW).toBe(0.4);
+    });
+
     it("derives solar capacity from panel count and capacity", () => {
         expect(getSolarCapacityKw({panelCount: 10, panelCapacityKw: 0.4})).toBe(4);
     });

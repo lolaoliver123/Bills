@@ -12,6 +12,10 @@ export type HourlyEnergyFlow = {
     batteryStateOfChargeKwh: number;
 };
 
+export type SimulationOptions = {
+    demandScale?: number;
+};
+
 export const BATTERY_ASSUMPTIONS = {
     maxChargeKwPerUnit: 5,
     maxDischargeKwPerUnit: 5,
@@ -54,7 +58,10 @@ const isCheapHour = (hour: number): boolean =>
 const isPeakHour = (hour: number): boolean =>
     hour >= BATTERY_ASSUMPTIONS.peakStartHour && hour < BATTERY_ASSUMPTIONS.peakEndHour;
 
-export const simulateDailyEnergy = ({household, assets}: HouseholdScenario): HourlyEnergyFlow[] => {
+export const simulateDailyEnergy = (
+    {household, assets}: HouseholdScenario,
+    {demandScale = 1}: SimulationOptions = {},
+): HourlyEnergyFlow[] => {
     const solarRatio = assets.solar ? getSolarCapacityKw(assets.solar) / REFERENCE_SOLAR_KW : 0;
     const heatPumpRatio = household.heatPump.capacityKw / REFERENCE_HEAT_PUMP_KW;
     const evRatio = household.electricVehicle
@@ -74,7 +81,7 @@ export const simulateDailyEnergy = ({household, assets}: HouseholdScenario): Hou
             generalElectricityWh +
             HEAT_PUMP_ELECTRICITY_WH[hour] * heatPumpRatio +
             EV_CHARGING_WH[hour] * evRatio,
-        );
+        ) * demandScale;
         const solarGenerationKwh = whToKwh(REFERENCE_SOLAR_GENERATION_WH[hour] * solarRatio);
         const directSolarKwh = Math.min(electricityDemandKwh, solarGenerationKwh);
         let remainingDemandKwh = electricityDemandKwh - directSolarKwh;
