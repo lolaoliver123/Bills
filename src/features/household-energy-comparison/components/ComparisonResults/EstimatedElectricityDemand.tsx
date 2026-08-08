@@ -1,4 +1,4 @@
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "../../../../components/ui/card.tsx";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "components/ui/card.tsx";
 
 const number = new Intl.NumberFormat("en-GB", {maximumFractionDigits: 0});
 

@@ -1,10 +1,8 @@
 import {Card, CardDescription, CardHeader, CardTitle} from "components/ui/card.tsx";
 import type {CalibrationError, FinancialComparison} from "features/household-energy-comparison/models/billing.ts";
-import {ComparisonResultHeader} from "./ComparisonResultHeader.tsx";
-import {
-    ComparisonResultContent
-} from ".//src/features/household-energy-comparison/components/ComparisonResults/ComparisonResultContent.tsx";
-import {EstimatedElectricityDemand} from "./EstimatedElectricityDemand.tsx";
+import {ComparisonResultHeader} from "features/household-energy-comparison/components/ComparisonResults/ComparisonResultHeader.tsx";
+import {ComparisonResultContent} from "features/household-energy-comparison/components/ComparisonResults/ComparisonResultContent.tsx";
+import {EstimatedElectricityDemand} from "features/household-energy-comparison/components/ComparisonResults/EstimatedElectricityDemand.tsx";
 
 
 export const ComparisonResults = ({comparison}: {

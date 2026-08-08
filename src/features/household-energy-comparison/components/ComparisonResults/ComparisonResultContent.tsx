@@ -1,7 +1,7 @@
-import type {BillEstimate} from "../../models/billing.ts";
-import type {HourlyEnergyFlow} from "../../models/simulation.ts";
-import {CardContent} from "../../../../components/ui/card.tsx";
-import {NetBarChart} from "../Graph.tsx";
+import type {BillEstimate} from "features/household-energy-comparison/models/billing.ts";
+import type {HourlyEnergyFlow} from "features/household-energy-comparison/models/simulation.ts";
+import {CardContent} from "components/ui/card.tsx";
+import {NetBarChart} from "features/household-energy-comparison/components/Graph.tsx";
 
 const currency = new Intl.NumberFormat("en-GB", {style: "currency", currency: "GBP"});
 
