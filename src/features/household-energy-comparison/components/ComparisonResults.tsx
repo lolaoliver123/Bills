@@ -1,6 +1,6 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "components/ui/card";
 import type {CalibrationError, FinancialComparison} from "features/household-energy-comparison/models/billing.ts";
-import NetBarChart from "features/household-energy-comparison/components/Graph";
+import {NetBarChart} from "features/household-energy-comparison/components/Graph";
 
 const currency = new Intl.NumberFormat("en-GB", {style: "currency", currency: "GBP"});
 const number = new Intl.NumberFormat("en-GB", {maximumFractionDigits: 0});
@@ -37,8 +37,11 @@ export const ComparisonResults = ({comparison}: {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-1 sm:grid-cols-2">
-                    <p><span className="font-semibold">Daily:</span> {comparison.inferredDailyDemandKwh.toFixed(1)} kWh</p>
-                    <p><span className="font-semibold">Annual:</span> {number.format(comparison.inferredAnnualDemandKwh)} kWh</p>
+                    <p><span className="font-semibold">Daily:</span> {comparison.inferredDailyDemandKwh.toFixed(1)} kWh
+                    </p>
+                    <p><span
+                        className="font-semibold">Annual:</span> {number.format(comparison.inferredAnnualDemandKwh)} kWh
+                    </p>
                 </CardContent>
             </Card>
             {comparison.results.map(({scenario, energyFlows, bill, monthlySavings, annualSavings}) => (
