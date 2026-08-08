@@ -1,5 +1,5 @@
 import {simulateDailyEnergy, type HourlyEnergyFlow} from "./simulation";
-import type {HouseholdScenario} from "@/forms/householdSetup/householdScenarios";
+import type {HouseholdScenario} from "../model/householdScenarios";
 
 export type ElectricityTariff = {
     nightImportGbpPerKwh: number;

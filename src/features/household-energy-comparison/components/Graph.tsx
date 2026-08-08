@@ -1,5 +1,5 @@
 import {Bar, BarChart, CartesianGrid, ReferenceLine, Tooltip, XAxis, YAxis} from "recharts";
-import type {HourlyEnergyFlow} from "./simulation.ts";
+import type {HourlyEnergyFlow} from "../lib/simulation.ts";
 
 type NetBarChartProps = {
     data: HourlyEnergyFlow[];

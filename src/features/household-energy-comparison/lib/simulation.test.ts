@@ -1,6 +1,6 @@
 import {describe, expect, it} from "vitest";
-import {BATTERY_ASSUMPTIONS, simulateDailyEnergy} from "../../src/components/graph/simulation";
-import type {HouseholdScenario} from "../../src/forms/householdSetup/householdScenarios";
+import {BATTERY_ASSUMPTIONS, simulateDailyEnergy} from "./simulation";
+import type {HouseholdScenario} from "../model/householdScenarios";
 
 const scenario = (assets: HouseholdScenario["assets"]): HouseholdScenario => ({
     id: "current",

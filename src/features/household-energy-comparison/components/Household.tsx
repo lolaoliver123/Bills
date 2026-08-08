@@ -6,7 +6,7 @@ import {
     type BatterySystem,
     type HouseholdFormDraft,
     type SolarSystem,
-} from "../schema.ts";
+} from "../model/schema.ts";
 import {BooleanField} from "./Boolean.tsx";
 import {NumberField} from "./Number.tsx";
 import {CalculatedField} from "./Calculated.tsx";

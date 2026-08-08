@@ -4,9 +4,9 @@ import {
     calculateBill,
     calibrateDemandScale,
     DEFAULT_ELECTRICITY_TARIFF,
-} from "../../src/components/graph/billing";
-import {simulateDailyEnergy, type HourlyEnergyFlow} from "../../src/components/graph/simulation";
-import type {HouseholdScenario} from "../../src/forms/householdSetup/householdScenarios";
+} from "./billing";
+import {simulateDailyEnergy, type HourlyEnergyFlow} from "./simulation";
+import type {HouseholdScenario} from "../model/householdScenarios";
 
 const scenario = (overrides: Partial<HouseholdScenario> = {}): HouseholdScenario => ({
     id: "current",
