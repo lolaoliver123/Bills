@@ -2,11 +2,11 @@ import {describe, expect, it} from "vitest";
 import {
     getBatteryCapacityKwh,
     getSolarCapacityKw,
-    PROPOSED_SOLAR_PANEL_CAPACITY_KW,
-    toHouseholdAssessment,
-    type HouseholdFormDraft,
-} from "./schema";
-import {buildHouseholdScenarios} from "./householdScenarios";
+    HouseholdFormDraft,
+    PROPOSED_SOLAR_PANEL_CAPACITY_KW, toHouseholdAssessment
+} from "../../../../src/features/household-energy-comparison/models/schema";
+import {buildHouseholdScenarios} from "../../../../src/features/household-energy-comparison/models/householdScenarios";
+
 
 const draft = (overrides: Partial<HouseholdFormDraft> = {}): HouseholdFormDraft => ({
     hasSolar: true,

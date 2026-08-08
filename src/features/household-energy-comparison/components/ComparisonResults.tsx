@@ -1,5 +1,5 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import type {CalibrationError, FinancialComparison} from "../lib/billing";
+import type {CalibrationError, FinancialComparison} from "@/features/household-energy-comparison/calculations/billing";
 import NetBarChart from "./Graph";
 
 const currency = new Intl.NumberFormat("en-GB", {style: "currency", currency: "GBP"});

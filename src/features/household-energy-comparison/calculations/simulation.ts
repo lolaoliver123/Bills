@@ -1,5 +1,5 @@
-import {getBatteryCapacityKwh, getSolarCapacityKw} from "../model/schema";
-import type {HouseholdScenario} from "../model/householdScenarios";
+import {getBatteryCapacityKwh, getSolarCapacityKw} from "@/features/household-energy-comparison/models/schema";
+import type {HouseholdScenario} from "@/features/household-energy-comparison/models/householdScenarios";
 
 export type HourlyEnergyFlow = {
     hour: number;
