@@ -18,6 +18,8 @@ export const flow = (
   hour,
   electricityDemandKwh: 0,
   heatPumpDemandKwh: 0,
+  evChargeKwh: 0,
+  evDischargeKwh: 0,
   solarGenerationKwh: 0,
   batteryChargeKwh: 0,
   batteryDischargeKwh: 0,

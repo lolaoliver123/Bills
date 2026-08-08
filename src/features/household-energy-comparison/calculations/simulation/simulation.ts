@@ -6,6 +6,7 @@ import type { HouseholdScenario } from 'features/household-energy-comparison/mod
 import {
   BATTERY_ASSUMPTIONS,
   EV_CHARGING_WH,
+  EV_RESERVE_FRACTION,
   GENERAL_ELECTRICITY_WH,
   HEAT_PUMP_ELECTRICITY_WH,
   REFERENCE_EV_CAPACITY_KWH,
@@ -35,6 +36,9 @@ export const simulateDailyEnergy = (
     ? (household.electricVehicle.batteryCapacityKwh * household.electricVehicle.chargesPerWeek) /
       (REFERENCE_EV_CAPACITY_KWH * REFERENCE_EV_CHARGES_PER_WEEK)
     : 0
+  const evCapacityKwh = household.electricVehicle?.batteryCapacityKwh ?? 0
+  const evReserveKwh = evCapacityKwh * EV_RESERVE_FRACTION
+  let evStateOfChargeKwh = evReserveKwh
 
   const batteryCapacityKwh = assets.battery ? getBatteryCapacityKwh(assets.battery) : 0
   const reserveKwh = batteryCapacityKwh * BATTERY_ASSUMPTIONS.reserveFraction
@@ -46,6 +50,7 @@ export const simulateDailyEnergy = (
 
   return GENERAL_ELECTRICITY_WH.map((generalElectricityWh, hour) => {
     const heatPumpDemandKwh = whToKwh(HEAT_PUMP_ELECTRICITY_WH[hour] * heatPumpRatio) * demandScale
+    const evChargeKwh = whToKwh(EV_CHARGING_WH[hour] * evRatio) * demandScale
     const electricityDemandKwh =
       whToKwh(
         generalElectricityWh +
@@ -56,10 +61,21 @@ export const simulateDailyEnergy = (
     const directSolarKwh = Math.min(electricityDemandKwh, solarGenerationKwh)
     let remainingDemandKwh = electricityDemandKwh - directSolarKwh
     let surplusSolarKwh = solarGenerationKwh - directSolarKwh
+    let evDischargeKwh = 0
     let batteryChargeKwh = 0
     let batteryDischargeKwh = 0
     let gridImportKwh: number
     let gridExportKwh: number
+
+    evStateOfChargeKwh = Math.min(evCapacityKwh, evStateOfChargeKwh + evChargeKwh)
+    if (household.electricVehicle?.canSupplyGrid && isPeakHour(hour)) {
+      evDischargeKwh = Math.min(
+        remainingDemandKwh,
+        Math.max(0, evStateOfChargeKwh - evReserveKwh),
+      )
+      evStateOfChargeKwh -= evDischargeKwh
+      remainingDemandKwh -= evDischargeKwh
+    }
 
     if (!assets.battery) {
       gridImportKwh = remainingDemandKwh
@@ -111,6 +127,8 @@ export const simulateDailyEnergy = (
       hour,
       electricityDemandKwh,
       heatPumpDemandKwh,
+      evChargeKwh,
+      evDischargeKwh,
       solarGenerationKwh,
       batteryChargeKwh,
       batteryDischargeKwh,

@@ -8,8 +8,13 @@ type NetBarChartProps = {
 export const NetBarChart = ({ data }: NetBarChartProps) => {
   const chartData = data.map((flow) => ({
     hour: flow.hour,
-    electricity: Math.max(0, flow.electricityDemandKwh - flow.heatPumpDemandKwh),
+    electricity: Math.max(
+      0,
+      flow.electricityDemandKwh - flow.heatPumpDemandKwh - flow.evChargeKwh,
+    ),
     heatPump: flow.heatPumpDemandKwh,
+    evCharge: flow.evChargeKwh,
+    evDischarge: -flow.evDischargeKwh,
     solar: -flow.solarGenerationKwh,
     batteryCharge: flow.batteryChargeKwh,
     batteryDischarge: -flow.batteryDischargeKwh,
@@ -35,17 +40,19 @@ export const NetBarChart = ({ data }: NetBarChartProps) => {
       <Tooltip />
       <ReferenceLine y={0} stroke="#000" />
       <Bar
-        dataKey="electricity"
-        name="Electricity demand"
-        fill="var(--chart-electricity)"
-        stackId="energy"
-      />
-      <Bar
         dataKey="heatPump"
         name="Heat pump demand"
         fill="var(--chart-heat-pump)"
         stackId="energy"
       />
+      <Bar
+        dataKey="electricity"
+        name="Electricity demand"
+        fill="var(--chart-electricity)"
+        stackId="energy"
+      />
+      <Bar dataKey="evCharge" name="EV charging" fill="var(--chart-ev)" stackId="energy" />
+      <Bar dataKey="evDischarge" name="EV discharging" fill="var(--chart-ev)" stackId="energy" />
       <Bar
         dataKey="batteryCharge"
         name="Battery charging"

@@ -15,6 +15,7 @@ export const REFERENCE_SOLAR_KW = 4.8
 export const REFERENCE_HEAT_PUMP_KW = 8
 export const REFERENCE_EV_CAPACITY_KWH = 50
 export const REFERENCE_EV_CHARGES_PER_WEEK = 2
+export const EV_RESERVE_FRACTION = 0.5
 
 // Representative energy consumed during each one-hour interval, in Wh.
 export const GENERAL_ELECTRICITY_WH = [

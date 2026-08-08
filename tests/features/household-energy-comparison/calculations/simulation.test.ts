@@ -15,6 +15,22 @@ const scenario = (assets: HouseholdScenario['assets']): HouseholdScenario => ({
 })
 
 const battery = { unitCount: 1, unitCapacityKwh: 13.5 }
+const electricVehicle = {
+  batteryCapacityKwh: 50,
+  chargesPerWeek: 2,
+  canSupplyGrid: true,
+}
+
+const scenarioWithEv = (canSupplyGrid = true): HouseholdScenario => {
+  const base = scenario({})
+  return {
+    ...base,
+    household: {
+      ...base.household,
+      electricVehicle: { ...electricVehicle, canSupplyGrid },
+    },
+  }
+}
 
 describe('daily energy simulation', () => {
   it('reports heat-pump demand separately while retaining it in total demand', () => {
@@ -24,6 +40,45 @@ describe('daily energy simulation', () => {
     for (const hour of result) {
       expect(hour.electricityDemandKwh).toBeGreaterThanOrEqual(hour.heatPumpDemandKwh)
     }
+  })
+
+  it('reports EV charging separately while retaining it in total demand', () => {
+    const result = simulateDailyEnergy(scenarioWithEv())
+
+    expect(result.some(({ evChargeKwh }) => evChargeKwh > 0)).toBe(true)
+    for (const hour of result) {
+      expect(hour.electricityDemandKwh).toBeGreaterThanOrEqual(
+        hour.heatPumpDemandKwh + hour.evChargeKwh,
+      )
+    }
+  })
+
+  it('discharges a grid-enabled EV at the household rate during the peak window', () => {
+    const result = simulateDailyEnergy(scenarioWithEv())
+
+    expect(
+      result.some(
+        ({ hour, evDischargeKwh }) => hour >= 16 && hour < 19 && evDischargeKwh > 0,
+      ),
+    ).toBe(true)
+    expect(
+      result
+        .filter(({ hour }) => hour < 16 || hour >= 19)
+        .every(({ evDischargeKwh }) => evDischargeKwh === 0),
+    ).toBe(true)
+    for (const hour of result) {
+      expect(hour.evDischargeKwh).toBeLessThanOrEqual(hour.electricityDemandKwh)
+    }
+
+    const charged = result.reduce((total, hour) => total + hour.evChargeKwh, 0)
+    const discharged = result.reduce((total, hour) => total + hour.evDischargeKwh, 0)
+    expect(discharged).toBeLessThanOrEqual(charged)
+  })
+
+  it('does not discharge an EV that cannot supply the grid', () => {
+    const result = simulateDailyEnergy(scenarioWithEv(false))
+
+    expect(result.every(({ evDischargeKwh }) => evDischargeKwh === 0)).toBe(true)
   })
 
   it('does not dispatch storage when no battery is installed', () => {
@@ -130,7 +185,11 @@ describe('daily energy simulation', () => {
     )
 
     for (const hour of result) {
-      const supplied = hour.gridImportKwh + hour.solarGenerationKwh + hour.batteryDischargeKwh
+      const supplied =
+        hour.gridImportKwh +
+        hour.solarGenerationKwh +
+        hour.batteryDischargeKwh +
+        hour.evDischargeKwh
       const consumed = hour.electricityDemandKwh + hour.batteryChargeKwh + hour.gridExportKwh
       expect(supplied).toBeCloseTo(consumed, 10)
     }
