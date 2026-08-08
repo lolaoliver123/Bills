@@ -11,7 +11,7 @@ export const BooleanField = ({ name, label }: { name: string; label: string }) =
         <div className="space-y-2">
             <Label>{label}</Label>
             <RadioGroup
-                value={field.value === undefined ? undefined : String(field.value)}
+                value={field.value === undefined ? "" : String(field.value)}
                 onValueChange={(value) => {
                     void helpers.setTouched(true, false);
                     void helpers.setValue(value === "true");

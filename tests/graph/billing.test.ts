@@ -79,6 +79,18 @@ describe("demand calibration", () => {
         expect(calibration).toMatchObject({kind: "calibration-error"});
     });
 
+    it("returns an explicit error for a bill above the modeled maximum", () => {
+        const calibration = calibrateDemandScale(scenario(), 1_000_000);
+
+        expect(calibration).toMatchObject({
+            kind: "calibration-error",
+            maximumMonthlySupplierBill: expect.any(Number),
+        });
+        if (typeof calibration === "number") return;
+        expect(calibration.maximumMonthlySupplierBill).toBeLessThan(1_000_000);
+        expect(calibration.message).toContain("above the modeled maximum");
+    });
+
     it.each([
         {battery: {unitCount: 1, unitCapacityKwh: 13.5}},
         {solar: {panelCount: 10, panelCapacityKw: 0.4}, battery: {unitCount: 1, unitCapacityKwh: 13.5}},

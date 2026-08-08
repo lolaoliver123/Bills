@@ -42,6 +42,7 @@ export type CalibrationError = {
     kind: "calibration-error";
     message: string;
     minimumMonthlySupplierBill: number;
+    maximumMonthlySupplierBill?: number;
 };
 
 export const DEFAULT_ELECTRICITY_TARIFF: ElectricityTariff = {
@@ -123,6 +124,16 @@ export const calibrateDemandScale = (
         upperScale < MAX_DEMAND_SCALE
     ) {
         upperScale *= 2;
+    }
+
+    const maximumMonthlySupplierBill = monthlySupplierBillAtScale(currentScenario, upperScale, tariff);
+    if (maximumMonthlySupplierBill < targetMonthlySupplierBill - CALIBRATION_TOLERANCE_GBP) {
+        return {
+            kind: "calibration-error",
+            message: `The entered bill is above the modeled maximum of £${maximumMonthlySupplierBill.toFixed(2)} per month.`,
+            minimumMonthlySupplierBill,
+            maximumMonthlySupplierBill,
+        };
     }
 
     for (let iteration = 0; iteration < CALIBRATION_ITERATIONS; iteration += 1) {
