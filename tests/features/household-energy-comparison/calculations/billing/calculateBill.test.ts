@@ -1,7 +1,7 @@
 import {describe, expect, it} from "vitest";
-import {calculateBill} from "@/features/household-energy-comparison/calculations/billing/calculateBill";
-import {DEFAULT_ELECTRICITY_TARIFF} from "@/features/household-energy-comparison/calculations/billing/config";
-import {flow} from "./fixtures";
+import {calculateBill} from "features/household-energy-comparison/calculations/billing/calculateBill";
+import {DEFAULT_ELECTRICITY_TARIFF} from "features/household-energy-comparison/calculations/billing/config";
+import {flow} from "testing/householdEnergyComparison";
 
 describe("electricity billing", () => {
     it("applies night, day, standing, and export rates", () => {

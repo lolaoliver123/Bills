@@ -1,16 +1,16 @@
-import type {HouseholdScenario} from "@/features/household-energy-comparison/models/householdScenarios.ts";
-import type {CalibrationError, FinancialComparison} from "@/features/household-energy-comparison/models/billing.ts";
-import {simulateDailyEnergy} from "@/features/household-energy-comparison/calculations/simulation/simulation.ts";
+import type {HouseholdScenario} from "features/household-energy-comparison/models/householdScenarios.ts";
+import type {CalibrationError, FinancialComparison} from "features/household-energy-comparison/models/billing.ts";
+import {simulateDailyEnergy} from "features/household-energy-comparison/calculations/simulation/simulation.ts";
 import {
     calculateBill
-} from "@/features/household-energy-comparison/calculations/billing/calculateBill.ts";
+} from "features/household-energy-comparison/calculations/billing/calculateBill.ts";
 import {
     calibrateDemandScale
-} from "@/features/household-energy-comparison/calculations/billing/calibrateDemandScale.ts";
+} from "features/household-energy-comparison/calculations/billing/calibrateDemandScale.ts";
 import {
     DAYS_PER_YEAR,
     DEFAULT_ELECTRICITY_TARIFF
-} from "@/features/household-energy-comparison/calculations/billing/config.ts";
+} from "features/household-energy-comparison/calculations/billing/config.ts";
 
 export const buildFinancialComparison = (
     scenarios: HouseholdScenario[],

@@ -1,11 +1,11 @@
 import {Form, Formik, type FormikErrors, setIn} from "formik";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Button} from "components/ui/button";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "components/ui/card";
 import {
     type HouseholdFormDraft,
     householdFormSchema,
-} from "@/features/household-energy-comparison/models/schema";
-import {HouseholdFields} from "./Household";
+} from "features/household-energy-comparison/models/schema";
+import {HouseholdFields} from "features/household-energy-comparison/components/Household";
 
 const validationErrors = (values: HouseholdFormDraft): FormikErrors<HouseholdFormDraft> => {
     const result = householdFormSchema.safeParse(values);

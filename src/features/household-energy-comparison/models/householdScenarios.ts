@@ -1,4 +1,4 @@
-import type {EnergyAssets, HouseholdAssessment, HouseholdProfile} from "./schema";
+import type {EnergyAssets, HouseholdAssessment, HouseholdProfile} from "features/household-energy-comparison/models/schema";
 
 export type ScenarioId = "current" | "solar" | "battery" | "solar-battery";
 

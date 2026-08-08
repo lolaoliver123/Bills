@@ -6,11 +6,11 @@ import {
     type BatterySystem,
     type HouseholdFormDraft,
     type SolarSystem,
-} from "@/features/household-energy-comparison/models/schema.ts";
-import {BooleanField} from "./Boolean.tsx";
-import {NumberField} from "./Number.tsx";
-import {CalculatedField} from "./Calculated.tsx";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+} from "features/household-energy-comparison/models/schema.ts";
+import {BooleanField} from "features/household-energy-comparison/components/Boolean.tsx";
+import {NumberField} from "features/household-energy-comparison/components/Number.tsx";
+import {CalculatedField} from "features/household-energy-comparison/components/Calculated.tsx";
+import {Card, CardContent, CardHeader, CardTitle} from "components/ui/card";
 
 const DetailCard = ({title, children}: { title: string; children: React.ReactNode }) => (
     <Card className="border-primary/15 bg-muted/30 shadow-none">

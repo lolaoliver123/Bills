@@ -1,6 +1,6 @@
 import { useField } from "formik";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input } from "components/ui/input";
+import { Label } from "components/ui/label";
 
 export const NumberField = ({ name, label, unit }: { name: string; label: string; unit?: string }) => {
     const [field, meta, helpers] = useField<number | undefined>(name);

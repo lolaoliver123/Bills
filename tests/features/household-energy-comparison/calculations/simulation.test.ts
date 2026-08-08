@@ -1,9 +1,9 @@
 import {describe, expect, it} from "vitest";
-import type {HouseholdScenario} from "../../../../src/features/household-energy-comparison/models/householdScenarios";
+import type {HouseholdScenario} from "features/household-energy-comparison/models/householdScenarios";
 import {
     simulateDailyEnergy
-} from "../../../../src/features/household-energy-comparison/calculations/simulation/simulation";
-import {BATTERY_ASSUMPTIONS} from "../../../../src/features/household-energy-comparison/calculations/simulation/config";
+} from "features/household-energy-comparison/calculations/simulation/simulation";
+import {BATTERY_ASSUMPTIONS} from "features/household-energy-comparison/calculations/simulation/config";
 
 const scenario = (assets: HouseholdScenario["assets"]): HouseholdScenario => ({
     id: "current",

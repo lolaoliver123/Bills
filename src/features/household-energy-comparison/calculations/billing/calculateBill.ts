@@ -1,12 +1,12 @@
-import {type HourlyEnergyFlow} from "../simulation/simulation.ts";
 import type {
     BillEstimate,
     PeriodBill
-} from "@/features/household-energy-comparison/models/billing.ts";
+} from "features/household-energy-comparison/models/billing.ts";
 import {
     DAYS_PER_YEAR,
     DEFAULT_ELECTRICITY_TARIFF, MONTHS_PER_YEAR
-} from "@/features/household-energy-comparison/calculations/billing/config.ts";
+} from "features/household-energy-comparison/calculations/billing/config.ts";
+import type {HourlyEnergyFlow} from "features/household-energy-comparison/models/simulation.ts";
 
 export const getImportRate = (hour: number, tariff = DEFAULT_ELECTRICITY_TARIFF): number =>
     hour >= tariff.nightStartHour && hour < tariff.nightEndHour

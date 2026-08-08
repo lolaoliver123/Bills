@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { cn } from "@/components/ui/helpers/utils"
+import { cn } from "components/ui/helpers/utils"
 
 const Label = ({ className, ...props }: React.ComponentProps<"label">) => {
   return (

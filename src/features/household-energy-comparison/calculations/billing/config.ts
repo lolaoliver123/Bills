@@ -1,4 +1,4 @@
-import type {ElectricityTariff} from "@/features/household-energy-comparison/models/billing.ts";
+import type {ElectricityTariff} from "features/household-energy-comparison/models/billing.ts";
 
 export const DEFAULT_ELECTRICITY_TARIFF: ElectricityTariff = {
     nightImportGbpPerKwh: 0.1453,

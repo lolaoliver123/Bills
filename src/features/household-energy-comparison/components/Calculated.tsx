@@ -1,5 +1,5 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input } from "components/ui/input";
+import { Label } from "components/ui/label";
 
 export const CalculatedField = ({ label, value, unit }: { label: string; value?: number; unit?: string }) => (
     <div className="space-y-2">

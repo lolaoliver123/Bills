@@ -1,6 +1,6 @@
 import {useNavigate} from "react-router-dom";
-import {useHouseholdEnergyComparison} from "../context";
-import {HouseholdSetupForm} from "./HouseholdSetupForm";
+import {useHouseholdEnergyComparison} from "features/household-energy-comparison/context";
+import {HouseholdSetupForm} from "features/household-energy-comparison/components/HouseholdSetupForm";
 
 export const HouseholdSetupPage = () => {
     const navigate = useNavigate();

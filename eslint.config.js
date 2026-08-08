@@ -20,6 +20,12 @@ export default defineConfig([
     },
     rules: {
       'func-style': ['error', 'expression', { allowArrowFunctions: true }],
+      'no-restricted-imports': ['error', {
+        patterns: [{
+          group: ['./**', '../**'],
+          message: 'Use an absolute import from src.',
+        }],
+      }],
     },
   },
 ])

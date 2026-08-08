@@ -1,5 +1,5 @@
-import {HouseholdEnergyComparisonProvider} from "@/features/household-energy-comparison";
-import {AppRouter} from "./router";
+import {HouseholdEnergyComparisonProvider} from "features/household-energy-comparison";
+import {AppRouter} from "app/router";
 
 const App = () => (
     <HouseholdEnergyComparisonProvider>

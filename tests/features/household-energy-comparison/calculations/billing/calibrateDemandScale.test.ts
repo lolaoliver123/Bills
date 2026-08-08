@@ -1,14 +1,14 @@
 import {describe, expect, it} from "vitest";
-import {scenario} from "./fixtures";
+import {scenario} from "testing/householdEnergyComparison";
 import {
     simulateDailyEnergy
-} from "../../../../../src/features/household-energy-comparison/calculations/simulation/simulation";
+} from "features/household-energy-comparison/calculations/simulation/simulation";
 import {
     calibrateDemandScale
-} from "../../../../../src/features/household-energy-comparison/calculations/billing/calibrateDemandScale";
+} from "features/household-energy-comparison/calculations/billing/calibrateDemandScale";
 import {
     calculateBill
-} from "../../../../../src/features/household-energy-comparison/calculations/billing/calculateBill";
+} from "features/household-energy-comparison/calculations/billing/calculateBill";
 
 describe("demand calibration", () => {
     it("reproduces the entered current supplier bill within one penny", () => {

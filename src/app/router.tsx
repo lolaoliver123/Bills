@@ -1,5 +1,5 @@
 import {Navigate, Route, Routes} from "react-router-dom";
-import {HouseholdComparisonResultsPage, HouseholdSetupPage} from "@/features/household-energy-comparison";
+import {HouseholdComparisonResultsPage, HouseholdSetupPage} from "features/household-energy-comparison";
 
 export const AppRouter = () => (
     <Routes>

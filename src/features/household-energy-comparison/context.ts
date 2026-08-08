@@ -1,5 +1,5 @@
 import {createContext, useContext} from "react";
-import type {HouseholdAssessment, HouseholdFormDraft} from "@/features/household-energy-comparison/models/schema";
+import type {HouseholdAssessment, HouseholdFormDraft} from "features/household-energy-comparison/models/schema";
 
 export type HouseholdEnergyComparisonContextValue = {
     draft: HouseholdFormDraft;

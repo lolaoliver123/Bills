@@ -1,6 +1,6 @@
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import type {CalibrationError, FinancialComparison} from "@/features/household-energy-comparison/models/billing.ts";
-import NetBarChart from "./Graph";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "components/ui/card";
+import type {CalibrationError, FinancialComparison} from "features/household-energy-comparison/models/billing.ts";
+import NetBarChart from "features/household-energy-comparison/components/Graph";
 
 const currency = new Intl.NumberFormat("en-GB", {style: "currency", currency: "GBP"});
 const number = new Intl.NumberFormat("en-GB", {maximumFractionDigits: 0});

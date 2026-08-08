@@ -1,13 +1,13 @@
-import {getBatteryCapacityKwh, getSolarCapacityKw} from "@/features/household-energy-comparison/models/schema.ts";
-import type {HouseholdScenario} from "@/features/household-energy-comparison/models/householdScenarios.ts";
+import {getBatteryCapacityKwh, getSolarCapacityKw} from "features/household-energy-comparison/models/schema.ts";
+import type {HouseholdScenario} from "features/household-energy-comparison/models/householdScenarios.ts";
 import {
     BATTERY_ASSUMPTIONS, EV_CHARGING_WH,
     GENERAL_ELECTRICITY_WH,
     HEAT_PUMP_ELECTRICITY_WH, REFERENCE_EV_CAPACITY_KWH, REFERENCE_EV_CHARGES_PER_WEEK, REFERENCE_HEAT_PUMP_KW,
     REFERENCE_SOLAR_GENERATION_WH,
     REFERENCE_SOLAR_KW
-} from "@/features/household-energy-comparison/calculations/simulation/config.ts";
-import type {HourlyEnergyFlow, SimulationOptions} from "@/features/household-energy-comparison/models/simulation.ts";
+} from "features/household-energy-comparison/calculations/simulation/config.ts";
+import type {HourlyEnergyFlow, SimulationOptions} from "features/household-energy-comparison/models/simulation.ts";
 
 
 const whToKwh = (value: number): number => value / 1000;
