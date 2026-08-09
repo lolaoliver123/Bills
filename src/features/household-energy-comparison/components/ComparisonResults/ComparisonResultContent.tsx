@@ -14,7 +14,7 @@ const formatSavings = (value: number) =>
 
 export const ComparisonResultContent = (props: {
   bill: BillEstimate
-  value: number
+  monthlySavings: number
   annualSavings: number
   showSavings: boolean
   data: HourlyEnergyFlow[]
@@ -40,7 +40,7 @@ export const ComparisonResultContent = (props: {
         />
         {props.showSavings && (
           <>
-            <ComparisonResultValue title="Monthly saving" value={formatSavings(props.value)} />
+            <ComparisonResultValue title="Monthly saving" value={formatSavings(props.monthlySavings)} />
             <ComparisonResultValue
               title="Annual saving"
               value={formatSavings(props.annualSavings)}

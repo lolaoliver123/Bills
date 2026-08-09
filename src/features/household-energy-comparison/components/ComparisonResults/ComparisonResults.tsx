@@ -36,7 +36,7 @@ export const ComparisonResults = ({
           <ComparisonResultHeader scenario={scenario} />
           <ComparisonResultContent
             bill={bill}
-            value={monthlySavings}
+            monthlySavings={monthlySavings}
             annualSavings={annualSavings}
             showSavings={scenario.id !== 'current'}
             data={energyFlows}
