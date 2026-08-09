@@ -1,8 +1,10 @@
 import type { ElectricityTariff } from 'features/household-energy-comparison/models/billing'
 import type { HouseholdScenario } from 'features/household-energy-comparison/models/householdScenarios'
-import type { HourlyEnergyFlow } from 'features/household-energy-comparison/models/simulation'
-import type { EnergyProfiles } from './buildEnergyProfiles'
-import type { StoragePlan } from './buildStoragePlan'
+import type {
+  HourlyEnergyFlow,
+  EnergyProfiles,
+} from 'features/household-energy-comparison/models/simulation'
+import type { StoragePlan } from 'features/household-energy-comparison/models/storage'
 import type { DispatchState } from 'features/household-energy-comparison/models/dispatches'
 import { dispatchEv } from './dispatchEv'
 import { dispatchBattery } from './dispatchBattery'

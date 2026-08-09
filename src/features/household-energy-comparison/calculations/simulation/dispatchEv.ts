@@ -1,4 +1,4 @@
-import type { StoragePlan } from './buildStoragePlan'
+import type { StoragePlan } from 'features/household-energy-comparison/models/storage'
 import { EV_ASSUMPTIONS } from './config'
 import type { EvDispatch } from 'features/household-energy-comparison/models/dispatches'
 

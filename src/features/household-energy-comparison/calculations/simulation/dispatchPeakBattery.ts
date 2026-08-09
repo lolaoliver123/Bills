@@ -1,4 +1,4 @@
-import type { StoragePlan } from './buildStoragePlan'
+import type { StoragePlan } from 'features/household-energy-comparison/models/storage'
 import { BATTERY_ASSUMPTIONS } from './config'
 import type { BatteryDispatch } from 'features/household-energy-comparison/models/dispatches'
 
