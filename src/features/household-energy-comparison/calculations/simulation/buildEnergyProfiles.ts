@@ -14,6 +14,7 @@ import {
   REFERENCE_SOLAR_KW,
   REFERENCE_SOLAR_YIELD_KWH_PER_KWP_YEAR,
 } from './config'
+import type { EnergyProfiles } from 'features/household-energy-comparison/models/simulation'
 
 const whToKwh = (value: number): number => value / WH_PER_KWH
 const sum = (values: readonly number[]): number => values.reduce((total, value) => total + value, 0)

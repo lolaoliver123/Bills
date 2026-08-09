@@ -1,16 +1,16 @@
-import type { StoragePlan } from './buildStoragePlan'
 import type { BatteryDispatch } from 'features/household-energy-comparison/models/dispatches'
 import { dispatchPeakBattery } from './dispatchPeakBattery'
 import { dispatchOffPeakBattery } from './dispatchOffPeakBattery'
+import type { StoragePlan } from 'features/household-energy-comparison/models/storage'
 
 type DispatchBatteryProps = {
-  hasBattery: boolean,
-  isPeakHour: boolean,
-  isCheapHour: boolean,
-  remainingDemandKwh: number,
-  surplusSolarKwh: number,
-  evExportKwh: number,
-  batteryStateOfChargeKwh: number,
+  hasBattery: boolean
+  isPeakHour: boolean
+  isCheapHour: boolean
+  remainingDemandKwh: number
+  surplusSolarKwh: number
+  evExportKwh: number
+  batteryStateOfChargeKwh: number
   plan: StoragePlan
 }
 

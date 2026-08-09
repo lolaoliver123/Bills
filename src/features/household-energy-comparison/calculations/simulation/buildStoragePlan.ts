@@ -1,11 +1,11 @@
 import { getBatteryCapacityKwh } from 'features/household-energy-comparison/models/schema'
 import type { ElectricityTariff } from 'features/household-energy-comparison/models/billing'
 import type { HouseholdScenario } from 'features/household-energy-comparison/models/householdScenarios'
-import type { EnergyProfiles } from './buildEnergyProfiles'
 import { BATTERY_ASSUMPTIONS, EV_ASSUMPTIONS, EV_RESERVE_FRACTION } from './config'
 import type { StoragePlan } from 'features/household-energy-comparison/models/storage'
 import { forecastPeakDemand } from './forecastPeakDemand'
 import { calculateDesiredPeakStoredKwh } from './calculateDesiredPeakStoredKwh'
+import type { EnergyProfiles } from 'features/household-energy-comparison/models/simulation'
 
 export const buildStoragePlan = (
   scenario: HouseholdScenario,

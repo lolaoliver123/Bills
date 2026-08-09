@@ -5,7 +5,7 @@ import {
   type HouseholdFormDraft,
   initialValues,
   toHouseholdAssessment,
-} from 'features/household-energy-comparison/models/schema.ts'
+} from 'features/household-energy-comparison/models/schema'
 
 export const HouseholdEnergyComparisonProvider = ({ children }: { children: ReactNode }) => {
   const [draft, setDraft] = useState<HouseholdFormDraft>(initialValues)

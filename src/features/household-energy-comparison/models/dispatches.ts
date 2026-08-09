@@ -1,4 +1,4 @@
-import type { HourlyEnergyFlow } from './simulation.ts'
+import type { HourlyEnergyFlow } from './simulation'
 
 export type EvDispatch = {
   remainingDemandKwh: number

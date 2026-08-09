@@ -1,6 +1,6 @@
 import { useField } from 'formik'
-import { Input } from 'components/ui/input.tsx'
-import { Label } from 'components/ui/label.tsx'
+import { Input } from 'components/ui/input'
+import { Label } from 'components/ui/label'
 
 export const NumberField = ({
   name,

@@ -1,7 +1,7 @@
 import { useId } from 'react'
 import { Input } from 'components/ui/input'
 import { Label } from 'components/ui/label'
-import { formatCalculatedValue } from './formatCalculatedValue'
+import { formatCalculatedValue } from 'features/household-energy-comparison/components/formatCalculatedValue'
 
 export const CalculatedField = ({
   label,
