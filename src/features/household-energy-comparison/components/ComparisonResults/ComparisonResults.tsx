@@ -37,7 +37,8 @@ export const ComparisonResults = ({
           <ComparisonResultContent
             bill={bill}
             value={monthlySavings}
-            value1={annualSavings}
+            annualSavings={annualSavings}
+            showSavings={scenario.id !== 'current'}
             data={energyFlows}
           />
         </Card>
