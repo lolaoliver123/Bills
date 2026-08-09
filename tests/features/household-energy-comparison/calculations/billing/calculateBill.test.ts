@@ -1,16 +1,28 @@
 import { describe, expect, it } from 'vitest'
-import { calculateBill } from 'features/household-energy-comparison/calculations/billing/calculateBill'
+import {
+  calculateBill,
+  getExportRate,
+} from 'features/household-energy-comparison/calculations/billing/calculateBill'
 import { DEFAULT_ELECTRICITY_TARIFF } from 'features/household-energy-comparison/calculations/billing/config'
 import { flow } from 'testing/householdEnergyComparison'
 
 describe('electricity billing', () => {
+  it('applies the peak export rate only inside the configured window', () => {
+    expect(getExportRate(15)).toBe(DEFAULT_ELECTRICITY_TARIFF.exportGbpPerKwh)
+    expect(getExportRate(16)).toBe(DEFAULT_ELECTRICITY_TARIFF.peakExportGbpPerKwh)
+    expect(getExportRate(18)).toBe(DEFAULT_ELECTRICITY_TARIFF.peakExportGbpPerKwh)
+    expect(getExportRate(19)).toBe(DEFAULT_ELECTRICITY_TARIFF.exportGbpPerKwh)
+  })
+
   it('applies night, day, standing, and export rates', () => {
-    const estimate = calculateBill([flow(2, 2, 0.5), flow(12, 3, 1)])
+    const estimate = calculateBill([flow(2, 2, 0.5), flow(12, 3, 1), flow(17, 0, 2)])
     const expectedSupplierBill =
       2 * DEFAULT_ELECTRICITY_TARIFF.nightImportGbpPerKwh +
       3 * DEFAULT_ELECTRICITY_TARIFF.dayImportGbpPerKwh +
       DEFAULT_ELECTRICITY_TARIFF.standingChargeGbpPerDay
-    const expectedExport = 1.5 * DEFAULT_ELECTRICITY_TARIFF.exportGbpPerKwh
+    const expectedExport =
+      1.5 * DEFAULT_ELECTRICITY_TARIFF.exportGbpPerKwh +
+      2 * DEFAULT_ELECTRICITY_TARIFF.peakExportGbpPerKwh
 
     expect(estimate.daily.supplierBill).toBeCloseTo(expectedSupplierBill)
     expect(estimate.daily.exportEarnings).toBeCloseTo(expectedExport)

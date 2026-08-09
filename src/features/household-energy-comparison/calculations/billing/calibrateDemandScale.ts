@@ -17,7 +17,7 @@ const monthlySupplierBillAtScale = (
   demandScale: number,
   tariff: ElectricityTariff,
 ): number =>
-  calculateBill(simulateDailyEnergy(scenario, { demandScale }), tariff).monthly.supplierBill
+  calculateBill(simulateDailyEnergy(scenario, { demandScale, tariff }), tariff).monthly.supplierBill
 
 export const calibrateDemandScale = (
   currentScenario: HouseholdScenario,

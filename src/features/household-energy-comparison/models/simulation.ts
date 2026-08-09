@@ -14,4 +14,5 @@ export type HourlyEnergyFlow = {
 
 export type SimulationOptions = {
   demandScale?: number
+  tariff?: import('./billing').ElectricityTariff
 }

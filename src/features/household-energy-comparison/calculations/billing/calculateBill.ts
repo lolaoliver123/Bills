@@ -7,6 +7,11 @@ export const getImportRate = (hour: number, tariff = DEFAULT_ELECTRICITY_TARIFF)
     ? tariff.nightImportGbpPerKwh
     : tariff.dayImportGbpPerKwh
 
+export const getExportRate = (hour: number, tariff = DEFAULT_ELECTRICITY_TARIFF): number =>
+  hour >= tariff.peakExportStartHour && hour < tariff.peakExportEndHour
+    ? tariff.peakExportGbpPerKwh
+    : tariff.exportGbpPerKwh
+
 const scalePeriodBill = (bill: PeriodBill, factor: number): PeriodBill => ({
   supplierBill: bill.supplierBill * factor,
   exportEarnings: bill.exportEarnings * factor,
@@ -22,7 +27,7 @@ export const calculateBill = (
     0,
   )
   const exportEarnings = energyFlows.reduce(
-    (total, flow) => total + flow.gridExportKwh * tariff.exportGbpPerKwh,
+    (total, flow) => total + flow.gridExportKwh * getExportRate(flow.hour, tariff),
     0,
   )
   const daily: PeriodBill = {

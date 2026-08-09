@@ -5,9 +5,12 @@ export type ElectricityTariff = {
   nightImportGbpPerKwh: number
   dayImportGbpPerKwh: number
   exportGbpPerKwh: number
+  peakExportGbpPerKwh: number
   standingChargeGbpPerDay: number
   nightStartHour: number
   nightEndHour: number
+  peakExportStartHour: number
+  peakExportEndHour: number
   effectivePeriod: string
 }
 

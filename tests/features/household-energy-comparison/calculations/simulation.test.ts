@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { HouseholdScenario } from 'features/household-energy-comparison/models/householdScenarios'
 import { simulateDailyEnergy } from 'features/household-energy-comparison/calculations/simulation/simulation'
-import { BATTERY_ASSUMPTIONS } from 'features/household-energy-comparison/calculations/simulation/config'
+import {
+  BATTERY_ASSUMPTIONS,
+  EV_ASSUMPTIONS,
+} from 'features/household-energy-comparison/calculations/simulation/config'
+import { DEFAULT_ELECTRICITY_TARIFF } from 'features/household-energy-comparison/calculations/billing/config'
 
 const scenario = (assets: HouseholdScenario['assets']): HouseholdScenario => ({
   id: 'current',
@@ -53,30 +57,44 @@ describe('daily energy simulation', () => {
     }
   })
 
-  it('discharges a grid-enabled EV at the household rate during the peak window', () => {
+  it('serves the household before exporting from a grid-enabled EV during the peak window', () => {
     const result = simulateDailyEnergy(scenarioWithEv())
 
     expect(
-      result.some(
-        ({ hour, evDischargeKwh }) => hour >= 16 && hour < 19 && evDischargeKwh > 0,
-      ),
+      result.some(({ hour, evDischargeKwh }) => hour >= 16 && hour < 19 && evDischargeKwh > 0),
     ).toBe(true)
     expect(
       result
         .filter(({ hour }) => hour < 16 || hour >= 19)
         .every(({ evDischargeKwh }) => evDischargeKwh === 0),
     ).toBe(true)
-    for (const hour of result) {
-      expect(hour.evDischargeKwh).toBeLessThanOrEqual(hour.electricityDemandKwh)
+    for (const hour of result.filter(({ hour }) => hour >= 16 && hour < 19)) {
+      expect(hour.evDischargeKwh).toBeLessThanOrEqual(EV_ASSUMPTIONS.maxDischargeKw)
+      if (hour.gridExportKwh > 0) expect(hour.gridImportKwh).toBe(0)
     }
+    expect(result.some(({ hour, gridExportKwh }) => hour >= 16 && gridExportKwh > 0)).toBe(true)
 
     const charged = result.reduce((total, hour) => total + hour.evChargeKwh, 0)
     const discharged = result.reduce((total, hour) => total + hour.evDischargeKwh, 0)
-    expect(discharged).toBeLessThanOrEqual(charged)
+    expect(discharged).toBeCloseTo(
+      charged * EV_ASSUMPTIONS.chargeEfficiency * EV_ASSUMPTIONS.dischargeEfficiency,
+    )
   })
 
   it('does not discharge an EV that cannot supply the grid', () => {
     const result = simulateDailyEnergy(scenarioWithEv(false))
+
+    expect(result.every(({ evDischargeKwh }) => evDischargeKwh === 0)).toBe(true)
+  })
+
+  it('leaves a grid-enabled EV charged when peak discharge is uneconomic', () => {
+    const tariff = {
+      ...DEFAULT_ELECTRICITY_TARIFF,
+      nightImportGbpPerKwh: 0.2,
+      dayImportGbpPerKwh: 0.15,
+      peakExportGbpPerKwh: 0.1,
+    }
+    const result = simulateDailyEnergy(scenarioWithEv(), { tariff })
 
     expect(result.every(({ evDischargeKwh }) => evDischargeKwh === 0)).toBe(true)
   })
@@ -95,9 +113,8 @@ describe('daily energy simulation', () => {
     ).toBe(true)
   })
 
-  it('grid-charges only in the cheap window and stops at the 50% target', () => {
+  it('grid-charges to the economically dispatchable target during the cheap window', () => {
     const result = simulateDailyEnergy(scenario({ battery }))
-    const targetKwh = battery.unitCapacityKwh * BATTERY_ASSUMPTIONS.cheapChargeTargetFraction
 
     expect(result.some(({ hour, batteryChargeKwh }) => hour < 5 && batteryChargeKwh > 0)).toBe(true)
     expect(
@@ -105,16 +122,28 @@ describe('daily energy simulation', () => {
         .filter(({ hour }) => hour >= 5 && hour < 16)
         .every(({ batteryChargeKwh }) => batteryChargeKwh === 0),
     ).toBe(true)
-    expect(result[4].batteryStateOfChargeKwh).toBeCloseTo(targetKwh)
+    expect(result[4].batteryStateOfChargeKwh).toBeCloseTo(battery.unitCapacityKwh)
+  })
+
+  it('leaves storage idle when neither peak use nor export is profitable', () => {
+    const tariff = {
+      ...DEFAULT_ELECTRICITY_TARIFF,
+      nightImportGbpPerKwh: 0.2,
+      dayImportGbpPerKwh: 0.15,
+      peakExportGbpPerKwh: 0.1,
+    }
+    const result = simulateDailyEnergy(scenario({ battery }), { tariff })
+
+    expect(result.every(({ batteryChargeKwh }) => batteryChargeKwh === 0)).toBe(true)
+    expect(result.every(({ batteryDischargeKwh }) => batteryDischargeKwh === 0)).toBe(true)
   })
 
   it('charges from surplus solar outside the cheap window', () => {
-    const result = simulateDailyEnergy(
-      scenario({
-        solar: { panelCount: 12, panelCapacityKw: 0.4 },
-        battery,
-      }),
-    )
+    const evScenario = scenarioWithEv()
+    const result = simulateDailyEnergy({
+      ...evScenario,
+      assets: { solar: { panelCount: 12, panelCapacityKw: 0.4 }, battery },
+    })
 
     expect(
       result.some(({ hour, batteryChargeKwh }) => hour >= 8 && hour < 16 && batteryChargeKwh > 0),

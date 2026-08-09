@@ -19,7 +19,7 @@ export const buildFinancialComparison = (
   if (typeof calibration !== 'number') return calibration
 
   const priced = scenarios.map((scenario) => {
-    const energyFlows = simulateDailyEnergy(scenario, { demandScale: calibration })
+    const energyFlows = simulateDailyEnergy(scenario, { demandScale: calibration, tariff })
     return { scenario, energyFlows, bill: calculateBill(energyFlows, tariff) }
   })
   const currentNetMonthly = priced[0].bill.monthly.netCost

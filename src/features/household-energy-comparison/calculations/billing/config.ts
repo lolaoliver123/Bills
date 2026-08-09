@@ -1,13 +1,16 @@
 import type { ElectricityTariff } from 'features/household-energy-comparison/models/billing'
 
 export const DEFAULT_ELECTRICITY_TARIFF: ElectricityTariff = {
-  nightImportGbpPerKwh: 0.1453,
+  nightImportGbpPerKwh: 0.12,
   dayImportGbpPerKwh: 0.3161,
-  exportGbpPerKwh: 0.1286,
+  exportGbpPerKwh: 0.09,
+  peakExportGbpPerKwh: 0.16,
   standingChargeGbpPerDay: 0.5695,
   nightStartHour: 0,
   nightEndHour: 7,
-  effectivePeriod: '1 July to 30 September 2026',
+  peakExportStartHour: 16,
+  peakExportEndHour: 19,
+  effectivePeriod: 'Illustrative smart import/export tariff',
 }
 
 export const DAYS_PER_YEAR = 365

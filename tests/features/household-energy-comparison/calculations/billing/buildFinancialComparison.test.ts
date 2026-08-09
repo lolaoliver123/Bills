@@ -27,4 +27,18 @@ describe('scenario financial comparison', () => {
     expect(comparison.results[1].monthlySavings).toBeGreaterThan(0)
     expect(comparison.inferredAnnualDemandKwh).toBeCloseTo(comparison.inferredDailyDemandKwh * 365)
   })
+
+  it.each([40, 120])('produces positive battery savings for a £%i current bill', (bill) => {
+    const current = scenario()
+    const battery = scenario({
+      id: 'battery',
+      label: 'With proposed battery',
+      assets: { battery: { unitCount: 1, unitCapacityKwh: 13.5 } },
+    })
+    const comparison = buildFinancialComparison([current, battery], bill)
+
+    expect('kind' in comparison).toBe(false)
+    if ('kind' in comparison) return
+    expect(comparison.results[1].monthlySavings).toBeGreaterThan(0)
+  })
 })
