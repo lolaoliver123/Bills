@@ -2,6 +2,7 @@ import { useFormikContext } from 'formik'
 import {
   getBatteryCapacityKwh,
   getSolarCapacityKw,
+  MAX_MONTHLY_ELECTRICITY_COST_GBP,
   PROPOSED_SOLAR_PANEL_CAPACITY_KW,
   type BatterySystem,
   type HouseholdFormDraft,
@@ -47,8 +48,31 @@ export const HouseholdFields = () => {
 
   return (
     <div className="grid gap-6">
-      <NumberField name="heatPump.capacityKw" label="Heat pump capacity" unit="kW" />
-
+      <DetailCard title="Heat Pump">
+        <NumberField name="heatPump.capacityKw" label="Heat pump capacity" unit="kW" />
+        <NumberField
+          name="heatPump.annualSpaceHeatingDemandKwh"
+          label="Annual space-heating demand"
+          unit="kWh"
+          description="Use the space-heating figure from the property’s EPC where available."
+        />
+        <BooleanField
+          name="heatPump.suppliesHotWater"
+          label="Does the heat pump also supply hot water?"
+        />
+        {values.heatPump.suppliesHotWater ? (
+          <NumberField
+            name="heatPump.annualHotWaterDemandKwh"
+            label="Annual hot-water demand"
+            unit="kWh"
+          />
+        ) : null}
+        <NumberField
+          name="heatPump.scop"
+          label="Heat pump seasonal efficiency (SCOP)"
+          description="Defaults to the UK government modelling assumption of 2.8."
+        />
+      </DetailCard>
       <BooleanField name="hasSolar" label="Does the household have solar panels?" />
       {values.hasSolar !== undefined ? (
         <DetailCard title={values.hasSolar ? 'Installed solar panels' : 'Proposed solar panels'}>
@@ -96,15 +120,23 @@ export const HouseholdFields = () => {
             label="Battery capacity"
             unit="kWh"
           />
-          <NumberField name="electricVehicle.chargesPerWeek" label="Charges per week" />
+          <NumberField
+            name="electricVehicle.chargesPerWeek"
+            label="Full battery-equivalent charges per week"
+            description="You can enter a fraction to represent partial charging, for example 0.5."
+          />
           <BooleanField
             name="electricVehicle.canSupplyGrid"
             label="Can it supply electricity back to the grid?"
           />
         </DetailCard>
       ) : null}
-
-      <NumberField name="monthlyElectricityCost" label="Monthly electricity bill" unit="£" />
+      <NumberField
+        name="monthlyElectricityCost"
+        label="Monthly electricity bill"
+        unit="£"
+        max={MAX_MONTHLY_ELECTRICITY_COST_GBP}
+      />
     </div>
   )
 }

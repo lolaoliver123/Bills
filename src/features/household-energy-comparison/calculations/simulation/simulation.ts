@@ -10,11 +10,9 @@ import {
   EV_RESERVE_FRACTION,
   GENERAL_ELECTRICITY_WH,
   HEAT_PUMP_ELECTRICITY_WH,
-  REFERENCE_EV_CAPACITY_KWH,
-  REFERENCE_EV_CHARGES_PER_WEEK,
-  REFERENCE_HEAT_PUMP_KW,
   REFERENCE_SOLAR_GENERATION_WH,
   REFERENCE_SOLAR_KW,
+  REFERENCE_SOLAR_YIELD_KWH_PER_KWP_YEAR,
 } from './config'
 import { DEFAULT_ELECTRICITY_TARIFF } from 'features/household-energy-comparison/calculations/billing/config'
 import type {
@@ -23,41 +21,51 @@ import type {
 } from 'features/household-energy-comparison/models/simulation'
 
 const whToKwh = (value: number): number => value / 1000
-const isCheapHour = (hour: number): boolean =>
-  hour >= BATTERY_ASSUMPTIONS.cheapStartHour && hour < BATTERY_ASSUMPTIONS.cheapEndHour
-const isPeakHour = (hour: number): boolean =>
-  hour >= BATTERY_ASSUMPTIONS.peakStartHour && hour < BATTERY_ASSUMPTIONS.peakEndHour
+const sum = (values: readonly number[]): number => values.reduce((total, value) => total + value, 0)
 
 export const simulateDailyEnergy = (
   { household, assets }: HouseholdScenario,
   { demandScale = 1, tariff = DEFAULT_ELECTRICITY_TARIFF }: SimulationOptions = {},
 ): HourlyEnergyFlow[] => {
   const solarRatio = assets.solar ? getSolarCapacityKw(assets.solar) / REFERENCE_SOLAR_KW : 0
-  const heatPumpRatio = household.heatPump.capacityKw / REFERENCE_HEAT_PUMP_KW
-  const evRatio = household.electricVehicle
-    ? (household.electricVehicle.batteryCapacityKwh * household.electricVehicle.chargesPerWeek) /
-      (REFERENCE_EV_CAPACITY_KWH * REFERENCE_EV_CHARGES_PER_WEEK)
+  const annualHeatPumpDemandKwh =
+    (household.heatPump.annualSpaceHeatingDemandKwh +
+      (household.heatPump.suppliesHotWater ? household.heatPump.annualHotWaterDemandKwh : 0)) /
+    household.heatPump.scop
+  const dailyHeatPumpDemandKwh = annualHeatPumpDemandKwh / 365
+  const heatPumpProfileScale = dailyHeatPumpDemandKwh / whToKwh(sum(HEAT_PUMP_ELECTRICITY_WH))
+  const dailyEvGridChargeKwh = household.electricVehicle
+    ? (household.electricVehicle.batteryCapacityKwh *
+        household.electricVehicle.chargesPerWeek *
+        52) /
+      365 /
+      EV_ASSUMPTIONS.chargeEfficiency
     : 0
+  const evProfileScale = dailyEvGridChargeKwh / whToKwh(sum(EV_CHARGING_WH))
   const evCapacityKwh = household.electricVehicle?.batteryCapacityKwh ?? 0
   const evReserveKwh = evCapacityKwh * EV_RESERVE_FRACTION
   let evStateOfChargeKwh = evReserveKwh
 
+  const heatPumpDemandAt = (hour: number): number =>
+    whToKwh(HEAT_PUMP_ELECTRICITY_WH[hour] * heatPumpProfileScale)
+  const evChargeAt = (hour: number): number => whToKwh(EV_CHARGING_WH[hour] * evProfileScale)
   const electricityDemandAt = (hour: number): number =>
-    whToKwh(
-      GENERAL_ELECTRICITY_WH[hour] +
-        HEAT_PUMP_ELECTRICITY_WH[hour] * heatPumpRatio +
-        EV_CHARGING_WH[hour] * evRatio,
-    ) * demandScale
-  const evChargeAt = (hour: number): number => whToKwh(EV_CHARGING_WH[hour] * evRatio) * demandScale
+    whToKwh(GENERAL_ELECTRICITY_WH[hour]) * demandScale + heatPumpDemandAt(hour) + evChargeAt(hour)
+  const referenceSolarDailyKwh = (REFERENCE_SOLAR_KW * REFERENCE_SOLAR_YIELD_KWH_PER_KWP_YEAR) / 365
+  const solarProfileScale = referenceSolarDailyKwh / whToKwh(sum(REFERENCE_SOLAR_GENERATION_WH))
   const solarGenerationAt = (hour: number): number =>
-    whToKwh(REFERENCE_SOLAR_GENERATION_WH[hour] * solarRatio)
+    whToKwh(REFERENCE_SOLAR_GENERATION_WH[hour] * solarProfileScale * solarRatio)
 
   const batteryCapacityKwh = assets.battery ? getBatteryCapacityKwh(assets.battery) : 0
   const reserveKwh = batteryCapacityKwh * BATTERY_ASSUMPTIONS.reserveFraction
   const maxChargeKwh = (assets.battery?.unitCount ?? 0) * BATTERY_ASSUMPTIONS.maxChargeKwPerUnit
   const maxDischargeKwh =
     (assets.battery?.unitCount ?? 0) * BATTERY_ASSUMPTIONS.maxDischargeKwPerUnit
-  const peakHours = BATTERY_ASSUMPTIONS.peakEndHour - BATTERY_ASSUMPTIONS.peakStartHour
+  const isCheapHour = (hour: number): boolean =>
+    hour >= tariff.nightStartHour && hour < tariff.nightEndHour
+  const isPeakHour = (hour: number): boolean =>
+    hour >= tariff.peakExportStartHour && hour < tariff.peakExportEndHour
+  const peakHours = tariff.peakExportEndHour - tariff.peakExportStartHour
   const batteryRoundTripEfficiency =
     BATTERY_ASSUMPTIONS.chargeEfficiency * BATTERY_ASSUMPTIONS.dischargeEfficiency
   const evRoundTripEfficiency = EV_ASSUMPTIONS.chargeEfficiency * EV_ASSUMPTIONS.dischargeEfficiency
@@ -74,18 +82,14 @@ export const simulateDailyEnergy = (
   const shouldStoreSolar = solarStorageValue > tariff.exportGbpPerKwh
 
   let forecastEvStateOfChargeKwh = evReserveKwh
-  for (let hour = 0; hour < BATTERY_ASSUMPTIONS.peakStartHour; hour += 1) {
+  for (let hour = 0; hour < tariff.peakExportStartHour; hour += 1) {
     forecastEvStateOfChargeKwh = Math.min(
       evCapacityKwh,
       forecastEvStateOfChargeKwh + evChargeAt(hour) * EV_ASSUMPTIONS.chargeEfficiency,
     )
   }
   let forecastPeakDemandKwh = 0
-  for (
-    let hour = BATTERY_ASSUMPTIONS.peakStartHour;
-    hour < BATTERY_ASSUMPTIONS.peakEndHour;
-    hour += 1
-  ) {
+  for (let hour = tariff.peakExportStartHour; hour < tariff.peakExportEndHour; hour += 1) {
     let residualDemandKwh = Math.max(0, electricityDemandAt(hour) - solarGenerationAt(hour))
     if (household.electricVehicle?.canSupplyGrid && evHomeDischargeProfitable) {
       const evOutputKwh = Math.min(
@@ -114,8 +118,7 @@ export const simulateDailyEnergy = (
       : reserveKwh
   const forecastSolarStoredKwh = shouldStoreSolar
     ? GENERAL_ELECTRICITY_WH.reduce((total, _, hour) => {
-        if (hour < BATTERY_ASSUMPTIONS.cheapEndHour || hour >= BATTERY_ASSUMPTIONS.peakStartHour)
-          return total
+        if (hour < tariff.nightEndHour || hour >= tariff.peakExportStartHour) return total
         const surplusKwh = Math.max(0, solarGenerationAt(hour) - electricityDemandAt(hour))
         return total + Math.min(surplusKwh, maxChargeKwh) * BATTERY_ASSUMPTIONS.chargeEfficiency
       }, 0)
@@ -127,7 +130,7 @@ export const simulateDailyEnergy = (
   let stateOfChargeKwh = reserveKwh
 
   return GENERAL_ELECTRICITY_WH.map((_, hour) => {
-    const heatPumpDemandKwh = whToKwh(HEAT_PUMP_ELECTRICITY_WH[hour] * heatPumpRatio) * demandScale
+    const heatPumpDemandKwh = heatPumpDemandAt(hour)
     const evChargeKwh = evChargeAt(hour)
     const electricityDemandKwh = electricityDemandAt(hour)
     const solarGenerationKwh = solarGenerationAt(hour)

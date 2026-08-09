@@ -12,6 +12,10 @@ export type BatterySystem = {
 
 export type HeatPump = {
   capacityKw: number
+  annualSpaceHeatingDemandKwh: number
+  suppliesHotWater: boolean
+  annualHotWaterDemandKwh: number
+  scop: number
 }
 
 export type ElectricVehicle = {
@@ -38,6 +42,8 @@ export type HouseholdAssessment = {
 }
 
 export const PROPOSED_SOLAR_PANEL_CAPACITY_KW = 0.4
+export const MAX_MONTHLY_ELECTRICITY_COST_GBP = 2_000
+export const DEFAULT_HEAT_PUMP_SCOP = 2.8
 
 const optionalNumber = z.number().optional()
 
@@ -75,7 +81,13 @@ export const householdFormSchema = z
     hasBatteries: z.boolean().optional(),
     hasElectricVehicle: z.boolean().optional(),
     monthlyElectricityCost: optionalNumber,
-    heatPump: z.object({ capacityKw: optionalNumber }),
+    heatPump: z.object({
+      capacityKw: optionalNumber,
+      annualSpaceHeatingDemandKwh: optionalNumber,
+      suppliesHotWater: z.boolean().optional(),
+      annualHotWaterDemandKwh: optionalNumber,
+      scop: optionalNumber,
+    }),
     solar: z.object({ panelCount: optionalNumber, panelCapacityKw: optionalNumber }),
     battery: z.object({ unitCount: optionalNumber, unitCapacityKwh: optionalNumber }),
     electricVehicle: z.object({
@@ -90,7 +102,30 @@ export const householdFormSchema = z
     })
 
     requirePositive(ctx, data.monthlyElectricityCost, ['monthlyElectricityCost'])
+    if (
+      data.monthlyElectricityCost !== undefined &&
+      data.monthlyElectricityCost > MAX_MONTHLY_ELECTRICITY_COST_GBP
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['monthlyElectricityCost'],
+        message: 'Must be £2,000 or less',
+      })
+    }
     requirePositive(ctx, data.heatPump.capacityKw, ['heatPump', 'capacityKw'])
+    requirePositive(ctx, data.heatPump.annualSpaceHeatingDemandKwh, [
+      'heatPump',
+      'annualSpaceHeatingDemandKwh',
+    ])
+    requirePositive(ctx, data.heatPump.scop, ['heatPump', 'scop'])
+    if (data.heatPump.suppliesHotWater === undefined) {
+      required(ctx, ['heatPump', 'suppliesHotWater'], 'Please choose yes or no')
+    } else if (data.heatPump.suppliesHotWater) {
+      requirePositive(ctx, data.heatPump.annualHotWaterDemandKwh, [
+        'heatPump',
+        'annualHotWaterDemandKwh',
+      ])
+    }
 
     if (data.hasSolar !== undefined) {
       requirePositiveInteger(ctx, data.solar.panelCount, ['solar', 'panelCount'])
@@ -125,7 +160,13 @@ export const initialValues: HouseholdFormDraft = {
   hasBatteries: undefined,
   hasElectricVehicle: undefined,
   monthlyElectricityCost: undefined,
-  heatPump: { capacityKw: undefined },
+  heatPump: {
+    capacityKw: undefined,
+    annualSpaceHeatingDemandKwh: undefined,
+    suppliesHotWater: undefined,
+    annualHotWaterDemandKwh: undefined,
+    scop: DEFAULT_HEAT_PUMP_SCOP,
+  },
   solar: { panelCount: undefined, panelCapacityKw: undefined },
   battery: { unitCount: undefined, unitCapacityKwh: undefined },
   electricVehicle: {
@@ -156,7 +197,15 @@ export const toHouseholdAssessment = (draft: HouseholdFormDraft): HouseholdAsses
 
   return {
     household: {
-      heatPump: { capacityKw: parsed.heatPump.capacityKw! },
+      heatPump: {
+        capacityKw: parsed.heatPump.capacityKw!,
+        annualSpaceHeatingDemandKwh: parsed.heatPump.annualSpaceHeatingDemandKwh!,
+        suppliesHotWater: parsed.heatPump.suppliesHotWater!,
+        annualHotWaterDemandKwh: parsed.heatPump.suppliesHotWater
+          ? parsed.heatPump.annualHotWaterDemandKwh!
+          : 0,
+        scop: parsed.heatPump.scop!,
+      },
       monthlyElectricityCost: parsed.monthlyElectricityCost!,
       electricVehicle: parsed.hasElectricVehicle
         ? {

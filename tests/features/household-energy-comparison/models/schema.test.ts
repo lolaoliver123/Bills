@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getBatteryCapacityKwh,
   getSolarCapacityKw,
-  HouseholdFormDraft,
+  type HouseholdFormDraft,
   PROPOSED_SOLAR_PANEL_CAPACITY_KW,
   toHouseholdAssessment,
 } from 'features/household-energy-comparison/models/schema'
@@ -13,7 +13,13 @@ const draft = (overrides: Partial<HouseholdFormDraft> = {}): HouseholdFormDraft 
   hasBatteries: true,
   hasElectricVehicle: false,
   monthlyElectricityCost: 120,
-  heatPump: { capacityKw: 8 },
+  heatPump: {
+    capacityKw: 8,
+    annualSpaceHeatingDemandKwh: 9_106,
+    suppliesHotWater: false,
+    annualHotWaterDemandKwh: undefined,
+    scop: 2.8,
+  },
   solar: { panelCount: 10, panelCapacityKw: 0.4 },
   battery: { unitCount: 1, unitCapacityKwh: 13.5 },
   electricVehicle: {},
@@ -35,6 +41,25 @@ describe('equipment capacity', () => {
 })
 
 describe('form-to-domain mapping', () => {
+  it('accepts £2,000 and rejects a larger monthly bill', () => {
+    expect(() => toHouseholdAssessment(draft({ monthlyElectricityCost: 2_000 }))).not.toThrow()
+    expect(() => toHouseholdAssessment(draft({ monthlyElectricityCost: 2_000.01 }))).toThrow(
+      'Must be £2,000 or less',
+    )
+  })
+
+  it('derives heat-pump inputs and excludes hot water when it is not supplied', () => {
+    const assessment = toHouseholdAssessment(draft())
+
+    expect(assessment.household.heatPump).toEqual({
+      capacityKw: 8,
+      annualSpaceHeatingDemandKwh: 9_106,
+      suppliesHotWater: false,
+      annualHotWaterDemandKwh: 0,
+      scop: 2.8,
+    })
+  })
+
   it('maps installed equipment into current assets', () => {
     const assessment = toHouseholdAssessment(draft())
 

@@ -6,10 +6,14 @@ export const NumberField = ({
   name,
   label,
   unit,
+  max,
+  description,
 }: {
   name: string
   label: string
   unit?: string
+  max?: number
+  description?: string
 }) => {
   const [field, meta, helpers] = useField<number | undefined>(name)
 
@@ -24,6 +28,7 @@ export const NumberField = ({
           name={name}
           type="number"
           min="0"
+          max={max}
           step="any"
           value={field.value ?? ''}
           onBlur={field.onBlur}
@@ -40,6 +45,7 @@ export const NumberField = ({
           </span>
         ) : null}
       </div>
+      {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
       {meta.touched && meta.error ? (
         <p id={`${name}-error`} className="text-sm text-destructive">
           {meta.error}

@@ -14,7 +14,12 @@ System totals are derived rather than persisted:
 - solar capacity = panel count × panel capacity in kW;
 - battery capacity = unit count × unit capacity in kWh.
 
-Proposed solar assumes `0.4 kW` peak capacity per panel. This follows a recent UK local-authority analysis that models
+Proposed solar assumes `0.4 kW` peak capacity per panel. A 10-panel proposal therefore produces the UK-government
+reference system size of `4 kWp`. The representative hourly solar shape is normalized to `850 kWh/kWp/year` before
+being scaled to the entered installation size. This is a national illustrative yield and does not adjust for postcode,
+roof direction, pitch, shading, or yearly weather.
+
+The panel assumption follows a recent UK local-authority analysis that models
 modern domestic panels at 0.4 kWp and approximately 330 kWh annual generation under its stated PVGIS assumptions. See
 the [Exeter City Council analysis](https://committees.exeter.gov.uk/documents/g7902/Public%20reports%20pack%2011th-Sep-2025%2017.30%20Strategic%20Scrutiny%20Committee.pdf).
 
@@ -42,9 +47,18 @@ electricity, solar, battery charging, and battery discharging.
 
 ## Demand and bill estimates
 
+Heat-pump electricity is derived from the EPC-style annual space-heating demand, plus annual hot-water demand when the
+heat pump supplies it, divided by the entered seasonal coefficient of performance (SCOP). SCOP defaults to `2.8`, the
+assumption used in the UK government's Warm Homes Plan technical annex. Rated heat-pump capacity affects the described
+installation but is not used as a proxy for annual consumption.
+
+Each EV charge entered per week means one full battery-equivalent charge. Fractional values can represent partial
+charging. Grid charging includes the modeled 95% charging loss.
+
 The entered monthly electricity cost is treated as the homeowner's current supplier bill, including standing charges but
-excluding separately paid export earnings. The calculator scales the entire illustrative demand profile until the
-current-equipment simulation reproduces that supplier bill. The same calibrated demand is then used for every proposed
+excluding separately paid export earnings. The calculator scales the general household demand profile until the
+current-equipment simulation reproduces that supplier bill. Known heat-pump and EV demand are held fixed while the
+otherwise-unmeasured general household demand is calibrated. The same calibrated demand is then used for every proposed
 scenario.
 
 The default is an illustrative smart import/export tariff designed to demonstrate time-shifting with batteries and
@@ -63,6 +77,8 @@ See [Octopus Outgoing tariffs](https://octopus.energy/smart/outgoing/).
 
 For each scenario, supplier charges and export earnings are shown separately, followed by their net cost. Monthly
 figures repeat the representative day by `365 ÷ 12`; annual figures repeat it by `365`.
+
+Monthly electricity-bill input is limited to `£2,000`.
 
 ## Calculation limits
 

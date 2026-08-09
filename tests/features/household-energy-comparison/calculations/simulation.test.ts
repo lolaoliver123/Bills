@@ -4,6 +4,7 @@ import { simulateDailyEnergy } from 'features/household-energy-comparison/calcul
 import {
   BATTERY_ASSUMPTIONS,
   EV_ASSUMPTIONS,
+  REFERENCE_SOLAR_YIELD_KWH_PER_KWP_YEAR,
 } from 'features/household-energy-comparison/calculations/simulation/config'
 import { DEFAULT_ELECTRICITY_TARIFF } from 'features/household-energy-comparison/calculations/billing/config'
 
@@ -12,7 +13,13 @@ const scenario = (assets: HouseholdScenario['assets']): HouseholdScenario => ({
   label: 'Test household',
   description: 'Test scenario',
   household: {
-    heatPump: { capacityKw: 8 },
+    heatPump: {
+      capacityKw: 8,
+      annualSpaceHeatingDemandKwh: 9_106,
+      suppliesHotWater: false,
+      annualHotWaterDemandKwh: 0,
+      scop: 2.8,
+    },
     monthlyElectricityCost: 120,
   },
   assets,
@@ -44,6 +51,19 @@ describe('daily energy simulation', () => {
     for (const hour of result) {
       expect(hour.electricityDemandKwh).toBeGreaterThanOrEqual(hour.heatPumpDemandKwh)
     }
+    const annualHeatPumpElectricity =
+      result.reduce((total, hour) => total + hour.heatPumpDemandKwh, 0) * 365
+    expect(annualHeatPumpElectricity).toBeCloseTo(9_106 / 2.8)
+  })
+
+  it('normalizes solar generation to the researched annual yield', () => {
+    const capacityKw = 4
+    const result = simulateDailyEnergy(
+      scenario({ solar: { panelCount: 10, panelCapacityKw: 0.4 } }),
+    )
+    const annualSolarKwh = result.reduce((total, hour) => total + hour.solarGenerationKwh, 0) * 365
+
+    expect(annualSolarKwh).toBeCloseTo(capacityKw * REFERENCE_SOLAR_YIELD_KWH_PER_KWP_YEAR)
   })
 
   it('reports EV charging separately while retaining it in total demand', () => {
@@ -116,13 +136,13 @@ describe('daily energy simulation', () => {
   it('grid-charges to the economically dispatchable target during the cheap window', () => {
     const result = simulateDailyEnergy(scenario({ battery }))
 
-    expect(result.some(({ hour, batteryChargeKwh }) => hour < 5 && batteryChargeKwh > 0)).toBe(true)
+    expect(result.some(({ hour, batteryChargeKwh }) => hour < 7 && batteryChargeKwh > 0)).toBe(true)
     expect(
       result
-        .filter(({ hour }) => hour >= 5 && hour < 16)
+        .filter(({ hour }) => hour >= 7 && hour < 16)
         .every(({ batteryChargeKwh }) => batteryChargeKwh === 0),
     ).toBe(true)
-    expect(result[4].batteryStateOfChargeKwh).toBeCloseTo(battery.unitCapacityKwh)
+    expect(result[6].batteryStateOfChargeKwh).toBeCloseTo(battery.unitCapacityKwh)
   })
 
   it('leaves storage idle when neither peak use nor export is profitable', () => {

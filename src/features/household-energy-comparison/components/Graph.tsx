@@ -9,7 +9,7 @@ import {
   YAxis,
 } from 'recharts'
 import type { HourlyEnergyFlow } from 'features/household-energy-comparison/models/simulation'
-import { BATTERY_ASSUMPTIONS } from 'features/household-energy-comparison/calculations/simulation/config'
+import { DEFAULT_ELECTRICITY_TARIFF } from 'features/household-energy-comparison/calculations/billing/config'
 
 type NetBarChartProps = {
   data: HourlyEnergyFlow[]
@@ -20,10 +20,7 @@ const HOUR_TICKS = Array.from({ length: 6 }, (_, index) => index * 4)
 export const NetBarChart = ({ data }: NetBarChartProps) => {
   const chartData = data.map((flow) => ({
     hour: flow.hour,
-    electricity: Math.max(
-      0,
-      flow.electricityDemandKwh - flow.heatPumpDemandKwh - flow.evChargeKwh,
-    ),
+    electricity: Math.max(0, flow.electricityDemandKwh - flow.heatPumpDemandKwh - flow.evChargeKwh),
     heatPump: flow.heatPumpDemandKwh,
     evCharge: flow.evChargeKwh,
     evDischarge: -flow.evDischargeKwh,
@@ -55,8 +52,8 @@ export const NetBarChart = ({ data }: NetBarChartProps) => {
       <YAxis unit=" kWh" />
       <Tooltip />
       <ReferenceArea
-        x1={BATTERY_ASSUMPTIONS.cheapStartHour - 0.5}
-        x2={BATTERY_ASSUMPTIONS.cheapEndHour - 0.5}
+        x1={DEFAULT_ELECTRICITY_TARIFF.nightStartHour - 0.5}
+        x2={DEFAULT_ELECTRICITY_TARIFF.nightEndHour - 0.5}
         fill="var(--chart-cheap-window)"
         fillOpacity={0.16}
         strokeOpacity={0}
@@ -69,8 +66,8 @@ export const NetBarChart = ({ data }: NetBarChartProps) => {
         }}
       />
       <ReferenceArea
-        x1={BATTERY_ASSUMPTIONS.peakStartHour - 0.5}
-        x2={BATTERY_ASSUMPTIONS.peakEndHour - 0.5}
+        x1={DEFAULT_ELECTRICITY_TARIFF.peakExportStartHour - 0.5}
+        x2={DEFAULT_ELECTRICITY_TARIFF.peakExportEndHour - 0.5}
         fill="var(--chart-peak-window)"
         fillOpacity={0.13}
         strokeOpacity={0}

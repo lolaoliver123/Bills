@@ -5,7 +5,16 @@ export const scenario = (overrides: Partial<HouseholdScenario> = {}): HouseholdS
   id: 'current',
   label: 'Current household',
   description: 'Test scenario',
-  household: { heatPump: { capacityKw: 8 }, monthlyElectricityCost: 120 },
+  household: {
+    heatPump: {
+      capacityKw: 8,
+      annualSpaceHeatingDemandKwh: 1_000,
+      suppliesHotWater: false,
+      annualHotWaterDemandKwh: 0,
+      scop: 2.8,
+    },
+    monthlyElectricityCost: 120,
+  },
   assets: {},
   ...overrides,
 })
