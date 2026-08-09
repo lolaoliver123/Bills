@@ -3,18 +3,6 @@
 React and TypeScript prototype for comparing a household's current heat-pump, solar, and battery setup with proposed
 solar and battery additions.
 
-## Requirements
-
-- Node.js `20.19+` or `22.12+` (required by Vite 8)
-- npm, using the version bundled with a supported Node.js release
-
-## Getting started
-
-```sh
-npm ci
-npm run dev
-```
-
 Vite prints the local development URL, normally `http://localhost:5173`.
 
 ## Project structure
@@ -129,14 +117,3 @@ npm run format:check # check formatting without changing files
 The tests cover form-to-domain mapping, scenario construction, tariff boundaries, bill calibration, hourly simulation,
 storage constraints, and energy conservation. Coverage reporting is available through Vitest's installed V8 provider,
 for example with `npm test -- --coverage`.
-
-## Deployment
-
-The production output is written to `dist`. Deploy it as a static single-page application and configure the host to
-serve `index.html` for unknown routes so that `/results` can be handled by React Router. The results route still requires
-an assessment from the current browser session and otherwise redirects to `/`.
-
-## Project status
-
-This is an illustrative prototype rather than a quotation tool. Browser support follows Vite's default modern-browser
-production target. No contribution process or software licence has been specified yet.
