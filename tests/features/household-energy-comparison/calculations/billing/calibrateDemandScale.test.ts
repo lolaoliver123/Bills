@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { scenario } from 'testing/householdEnergyComparison'
 import { simulateDailyEnergy } from 'features/household-energy-comparison/calculations/simulation/simulation'
 import { calibrateDemandScale } from 'features/household-energy-comparison/calculations/billing/calibrateDemandScale'
 import { calculateBill } from 'features/household-energy-comparison/calculations/billing/calculateBill'
+import { scenario } from '../../householdEnergyComparison.ts'
 
 describe('demand calibration', () => {
   it('reproduces the entered current supplier bill within one penny', () => {

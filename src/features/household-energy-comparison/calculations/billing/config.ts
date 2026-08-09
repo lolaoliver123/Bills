@@ -13,7 +13,6 @@ export const DEFAULT_ELECTRICITY_TARIFF: ElectricityTariff = {
   effectivePeriod: 'Illustrative smart import/export tariff',
 }
 
-export const DAYS_PER_YEAR = 365
 export const MONTHS_PER_YEAR = 12
 
 export const CALIBRATION_TOLERANCE_GBP = 0.0001
