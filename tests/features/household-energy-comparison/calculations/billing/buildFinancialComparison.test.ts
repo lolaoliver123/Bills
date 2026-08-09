@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildFinancialComparison } from 'features/household-energy-comparison/calculations/billing/buildFinancialComparison'
-import { scenario } from '../../householdEnergyComparison.ts'
+import { scenario } from 'test-support/householdEnergyComparison'
 
 describe('scenario financial comparison', () => {
   it('uses one calibrated demand for every scenario and calculates savings', () => {

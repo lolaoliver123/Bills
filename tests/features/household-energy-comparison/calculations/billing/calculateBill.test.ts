@@ -4,7 +4,7 @@ import {
   getExportRate,
 } from 'features/household-energy-comparison/calculations/billing/calculateBill'
 import { DEFAULT_ELECTRICITY_TARIFF } from 'features/household-energy-comparison/calculations/billing/config'
-import { flow } from '../../householdEnergyComparison.ts'
+import { flow } from 'test-support/householdEnergyComparison'
 
 describe('electricity billing', () => {
   it('applies the peak export rate only inside the configured window', () => {

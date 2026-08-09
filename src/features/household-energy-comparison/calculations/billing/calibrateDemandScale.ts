@@ -19,6 +19,51 @@ const monthlySupplierBillAtScale = (
 ): number =>
   calculateBill(simulateDailyEnergy(scenario, { demandScale, tariff }), tariff).monthly.supplierBill
 
+const findUpperScale = (
+  scenario: HouseholdScenario,
+  targetMonthlySupplierBill: number,
+  tariff: ElectricityTariff,
+  upperScale = 1,
+): number =>
+  monthlySupplierBillAtScale(scenario, upperScale, tariff) < targetMonthlySupplierBill &&
+  upperScale < MAX_DEMAND_SCALE
+    ? findUpperScale(scenario, targetMonthlySupplierBill, tariff, upperScale * 2)
+    : upperScale
+
+const findDemandScale = (
+  scenario: HouseholdScenario,
+  targetMonthlySupplierBill: number,
+  tariff: ElectricityTariff,
+  lowerScale: number,
+  upperScale: number,
+  iterationsRemaining = CALIBRATION_ITERATIONS,
+): number => {
+  const midpoint = (lowerScale + upperScale) / 2
+  if (iterationsRemaining === 0) return midpoint
+
+  const midpointBill = monthlySupplierBillAtScale(scenario, midpoint, tariff)
+  if (Math.abs(midpointBill - targetMonthlySupplierBill) <= CALIBRATION_TOLERANCE_GBP)
+    return midpoint
+
+  return midpointBill < targetMonthlySupplierBill
+    ? findDemandScale(
+        scenario,
+        targetMonthlySupplierBill,
+        tariff,
+        midpoint,
+        upperScale,
+        iterationsRemaining - 1,
+      )
+    : findDemandScale(
+        scenario,
+        targetMonthlySupplierBill,
+        tariff,
+        lowerScale,
+        midpoint,
+        iterationsRemaining - 1,
+      )
+}
+
 export const calibrateDemandScale = (
   currentScenario: HouseholdScenario,
   targetMonthlySupplierBill: number,
@@ -33,14 +78,7 @@ export const calibrateDemandScale = (
     }
   }
 
-  let lowerScale = 0
-  let upperScale = 1
-  while (
-    monthlySupplierBillAtScale(currentScenario, upperScale, tariff) < targetMonthlySupplierBill &&
-    upperScale < MAX_DEMAND_SCALE
-  ) {
-    upperScale *= 2
-  }
+  const upperScale = findUpperScale(currentScenario, targetMonthlySupplierBill, tariff)
 
   const maximumMonthlySupplierBill = monthlySupplierBillAtScale(currentScenario, upperScale, tariff)
   if (maximumMonthlySupplierBill < targetMonthlySupplierBill - CALIBRATION_TOLERANCE_GBP) {
@@ -52,14 +90,5 @@ export const calibrateDemandScale = (
     }
   }
 
-  for (let iteration = 0; iteration < CALIBRATION_ITERATIONS; iteration += 1) {
-    const midpoint = (lowerScale + upperScale) / 2
-    const midpointBill = monthlySupplierBillAtScale(currentScenario, midpoint, tariff)
-    if (Math.abs(midpointBill - targetMonthlySupplierBill) <= CALIBRATION_TOLERANCE_GBP)
-      return midpoint
-    if (midpointBill < targetMonthlySupplierBill) lowerScale = midpoint
-    else upperScale = midpoint
-  }
-
-  return (lowerScale + upperScale) / 2
+  return findDemandScale(currentScenario, targetMonthlySupplierBill, tariff, 0, upperScale)
 }

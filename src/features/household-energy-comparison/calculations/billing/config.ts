@@ -1,4 +1,5 @@
 import type { ElectricityTariff } from 'features/household-energy-comparison/models/billing'
+export { DAYS_PER_YEAR } from 'features/household-energy-comparison/calculations/config'
 
 export const DEFAULT_ELECTRICITY_TARIFF: ElectricityTariff = {
   nightImportGbpPerKwh: 0.12,

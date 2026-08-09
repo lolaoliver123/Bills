@@ -27,32 +27,42 @@ const forecastPeakDemand = (
   evReserveKwh: number,
   evHomeDischargeProfitable: boolean,
 ): number => {
-  let evStateOfChargeKwh = evReserveKwh
-  for (let hour = 0; hour < tariff.peakExportStartHour; hour += 1) {
-    evStateOfChargeKwh = Math.min(
-      evCapacityKwh,
-      evStateOfChargeKwh + profiles.evChargeKwh[hour] * EV_ASSUMPTIONS.chargeEfficiency,
+  const prePeakEvStateOfChargeKwh = profiles.evChargeKwh
+    .slice(0, tariff.peakExportStartHour)
+    .reduce(
+      (stateOfChargeKwh, chargeKwh) =>
+        Math.min(evCapacityKwh, stateOfChargeKwh + chargeKwh * EV_ASSUMPTIONS.chargeEfficiency),
+      evReserveKwh,
     )
-  }
+  const canEvSupplyPeakDemand =
+    scenario.household.electricVehicle?.canSupplyGrid && evHomeDischargeProfitable
 
-  let peakDemandKwh = 0
-  for (let hour = tariff.peakExportStartHour; hour < tariff.peakExportEndHour; hour += 1) {
-    let residualDemandKwh = Math.max(
-      0,
-      profiles.electricityDemandKwh[hour] - profiles.solarGenerationKwh[hour],
-    )
-    if (scenario.household.electricVehicle?.canSupplyGrid && evHomeDischargeProfitable) {
-      const evOutputKwh = Math.min(
-        residualDemandKwh,
-        EV_ASSUMPTIONS.maxDischargeKw,
-        Math.max(0, evStateOfChargeKwh - evReserveKwh) * EV_ASSUMPTIONS.dischargeEfficiency,
-      )
-      evStateOfChargeKwh -= evOutputKwh / EV_ASSUMPTIONS.dischargeEfficiency
-      residualDemandKwh -= evOutputKwh
-    }
-    peakDemandKwh += residualDemandKwh
-  }
-  return peakDemandKwh
+  return profiles.electricityDemandKwh
+    .slice(tariff.peakExportStartHour, tariff.peakExportEndHour)
+    .reduce(
+      (forecast, electricityDemandKwh, peakHourIndex) => {
+        const hour = tariff.peakExportStartHour + peakHourIndex
+        const demandAfterSolarKwh = Math.max(
+          0,
+          electricityDemandKwh - profiles.solarGenerationKwh[hour],
+        )
+        const evOutputKwh = canEvSupplyPeakDemand
+          ? Math.min(
+              demandAfterSolarKwh,
+              EV_ASSUMPTIONS.maxDischargeKw,
+              Math.max(0, forecast.evStateOfChargeKwh - evReserveKwh) *
+                EV_ASSUMPTIONS.dischargeEfficiency,
+            )
+          : 0
+
+        return {
+          evStateOfChargeKwh:
+            forecast.evStateOfChargeKwh - evOutputKwh / EV_ASSUMPTIONS.dischargeEfficiency,
+          peakDemandKwh: forecast.peakDemandKwh + demandAfterSolarKwh - evOutputKwh,
+        }
+      },
+      { evStateOfChargeKwh: prePeakEvStateOfChargeKwh, peakDemandKwh: 0 },
+    ).peakDemandKwh
 }
 
 type DesiredPeakStorageOptions = {

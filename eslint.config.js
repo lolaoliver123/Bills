@@ -8,7 +8,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const srcDirectory = fileURLToPath(new URL('./src', import.meta.url))
-const srcAliases = new Set(['app', 'components', 'features', 'testing'])
+const srcAliases = new Set(['app', 'components', 'features'])
 
 const localRules = {
   rules: {
@@ -66,6 +66,13 @@ export default defineConfig([
     rules: {
       'func-style': ['error', 'expression', { allowArrowFunctions: true }],
       'local/prefer-relative-sibling-imports': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "VariableDeclaration[kind='let']",
+          message: 'Use immutable state and const declarations instead of let.',
+        },
+      ],
       'no-restricted-imports': [
         'error',
         {
