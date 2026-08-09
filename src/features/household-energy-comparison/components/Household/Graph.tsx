@@ -10,6 +10,7 @@ import {
 } from 'recharts'
 import type { HourlyEnergyFlow } from 'features/household-energy-comparison/models/simulation'
 import { DEFAULT_ELECTRICITY_TARIFF } from 'features/household-energy-comparison/calculations/billing/config'
+import { formatCalculatedValue } from 'features/household-energy-comparison/components/formatCalculatedValue'
 
 type NetBarChartProps = {
   data: HourlyEnergyFlow[]
@@ -49,8 +50,8 @@ export const NetBarChart = ({ data }: NetBarChartProps) => {
         allowDecimals={false}
         tickFormatter={(hour) => `${String(hour).padStart(2, '0')}:00`}
       />
-      <YAxis unit=" kWh" />
-      <Tooltip />
+      <YAxis unit=" kWh" tickFormatter={(value) => formatCalculatedValue(Number(value))} />
+      <Tooltip formatter={(value) => `${formatCalculatedValue(Number(value))} kWh`} />
       <ReferenceArea
         x1={DEFAULT_ELECTRICITY_TARIFF.nightStartHour - 0.5}
         x2={DEFAULT_ELECTRICITY_TARIFF.nightEndHour - 0.5}

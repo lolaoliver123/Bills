@@ -1,6 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card'
-
-const number = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 })
+import { formatCalculatedValue } from 'features/household-energy-comparison/components/formatCalculatedValue'
 
 export const EstimatedElectricityDemand = (props: {
   inferredDailyDemandKwh: number
@@ -15,10 +14,11 @@ export const EstimatedElectricityDemand = (props: {
     </CardHeader>
     <CardContent className="grid gap-1 sm:grid-cols-2">
       <p>
-        <span className="font-semibold">Daily:</span> {props.inferredDailyDemandKwh.toFixed(1)} kWh
+        <span className="font-semibold">Daily:</span>{' '}
+        {formatCalculatedValue(props.inferredDailyDemandKwh)} kWh
       </p>
       <p>
-        <span className="font-semibold">Annual:</span> {number.format(props.value)} kWh
+        <span className="font-semibold">Annual:</span> {formatCalculatedValue(props.value)} kWh
       </p>
     </CardContent>
   </Card>

@@ -1,6 +1,7 @@
 import { useId } from 'react'
 import { Input } from 'components/ui/input'
 import { Label } from 'components/ui/label'
+import { formatCalculatedValue } from './formatCalculatedValue'
 
 export const CalculatedField = ({
   label,
@@ -22,7 +23,7 @@ export const CalculatedField = ({
         <Input
           id={inputId}
           type="number"
-          value={value ?? ''}
+          value={value === undefined ? '' : formatCalculatedValue(value)}
           readOnly
           className={unit ? 'bg-muted pr-12' : 'bg-muted'}
         />

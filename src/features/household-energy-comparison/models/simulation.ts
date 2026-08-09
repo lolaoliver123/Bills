@@ -16,3 +16,10 @@ export type SimulationOptions = {
   demandScale?: number
   tariff?: import('./billing').ElectricityTariff
 }
+
+export type EnergyProfiles = {
+  heatPumpDemandKwh: number[]
+  evChargeKwh: number[]
+  electricityDemandKwh: number[]
+  solarGenerationKwh: number[]
+}

@@ -1,6 +1,6 @@
 import type { ElectricityTariff } from 'features/household-energy-comparison/models/billing'
 import type { HouseholdScenario } from 'features/household-energy-comparison/models/householdScenarios'
-import type { EnergyProfiles } from './buildEnergyProfiles'
+import type { EnergyProfiles } from 'features/household-energy-comparison/models/simulation'
 import { EV_ASSUMPTIONS } from './config'
 
 export const forecastPeakDemand = (

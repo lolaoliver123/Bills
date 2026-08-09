@@ -15,13 +15,6 @@ import {
   REFERENCE_SOLAR_YIELD_KWH_PER_KWP_YEAR,
 } from './config'
 
-export type EnergyProfiles = {
-  heatPumpDemandKwh: number[]
-  evChargeKwh: number[]
-  electricityDemandKwh: number[]
-  solarGenerationKwh: number[]
-}
-
 const whToKwh = (value: number): number => value / WH_PER_KWH
 const sum = (values: readonly number[]): number => values.reduce((total, value) => total + value, 0)
 

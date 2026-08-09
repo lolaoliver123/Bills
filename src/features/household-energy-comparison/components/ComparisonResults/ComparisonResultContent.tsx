@@ -4,7 +4,12 @@ import { CardContent } from 'components/ui/card'
 import { NetBarChart } from 'features/household-energy-comparison/components/Household/Graph'
 import { ComparisonResultValue } from './ComparisonResultValue'
 
-const currency = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' })
+const currency = new Intl.NumberFormat('en-GB', {
+  style: 'currency',
+  currency: 'GBP',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
 
 const formatNetCost = (value: number) =>
   value < 0 ? `${currency.format(Math.abs(value))} credit` : currency.format(value)
