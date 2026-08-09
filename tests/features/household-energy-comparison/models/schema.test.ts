@@ -6,7 +6,7 @@ import {
   PROPOSED_SOLAR_PANEL_CAPACITY_KW,
   toHouseholdAssessment,
 } from 'features/household-energy-comparison/models/schema'
-import { buildHouseholdScenarios } from 'features/household-energy-comparison/models/householdScenarios'
+import { buildHouseholdScenarios } from 'features/household-energy-comparison/calculations/billing/buildHouseholdScenario'
 
 const draft = (overrides: Partial<HouseholdFormDraft> = {}): HouseholdFormDraft => ({
   hasSolar: true,

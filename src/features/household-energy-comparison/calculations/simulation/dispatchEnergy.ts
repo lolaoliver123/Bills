@@ -3,156 +3,12 @@ import type { HouseholdScenario } from 'features/household-energy-comparison/mod
 import type { HourlyEnergyFlow } from 'features/household-energy-comparison/models/simulation'
 import type { EnergyProfiles } from './buildEnergyProfiles'
 import type { StoragePlan } from './buildStoragePlan'
-import { BATTERY_ASSUMPTIONS, EV_ASSUMPTIONS } from './config'
-import type { BatteryDispatch, DispatchState, EvDispatch } from 'features/household-energy-comparison/models/dispatches'
-
+import type { DispatchState } from 'features/household-energy-comparison/models/dispatches'
+import { dispatchEv } from './dispatchEv'
+import { dispatchBattery } from './dispatchBattery'
 
 const isWithinWindow = (hour: number, startHour: number, endHour: number): boolean =>
   hour >= startHour && hour < endHour
-
-const dispatchEv = (
-  canSupplyGrid: boolean,
-  isPeakHour: boolean,
-  evChargeKwh: number,
-  remainingDemandKwh: number,
-  evStateOfChargeKwh: number,
-  plan: StoragePlan,
-): EvDispatch => {
-  const chargedStateOfChargeKwh = Math.min(
-    plan.evCapacityKwh,
-    evStateOfChargeKwh + evChargeKwh * EV_ASSUMPTIONS.chargeEfficiency,
-  )
-  if (!canSupplyGrid || !isPeakHour) {
-    return {
-      remainingDemandKwh,
-      evDischargeKwh: 0,
-      evExportKwh: 0,
-      evStateOfChargeKwh: chargedStateOfChargeKwh,
-    }
-  }
-
-  const availableEvDischargeKwh = Math.min(
-    EV_ASSUMPTIONS.maxDischargeKw,
-    Math.max(0, chargedStateOfChargeKwh - plan.evReserveKwh) * EV_ASSUMPTIONS.dischargeEfficiency,
-  )
-  const dischargeToHomeKwh = plan.evHomeDischargeProfitable
-    ? Math.min(remainingDemandKwh, availableEvDischargeKwh)
-    : 0
-  const evExportKwh = plan.evExportProfitable ? availableEvDischargeKwh - dischargeToHomeKwh : 0
-  const evDischargeKwh = dischargeToHomeKwh + evExportKwh
-
-  return {
-    remainingDemandKwh: remainingDemandKwh - dischargeToHomeKwh,
-    evDischargeKwh,
-    evExportKwh,
-    evStateOfChargeKwh:
-      chargedStateOfChargeKwh - evDischargeKwh / EV_ASSUMPTIONS.dischargeEfficiency,
-  }
-}
-
-const dispatchPeakBattery = (
-  remainingDemandKwh: number,
-  surplusSolarKwh: number,
-  evExportKwh: number,
-  batteryStateOfChargeKwh: number,
-  plan: StoragePlan,
-): BatteryDispatch => {
-  const availableDischargeKwh = Math.min(
-    plan.maxBatteryDischargeKwh,
-    Math.max(0, batteryStateOfChargeKwh - plan.batteryReserveKwh) *
-      BATTERY_ASSUMPTIONS.dischargeEfficiency,
-  )
-  const dischargeToHomeKwh = plan.batteryHomeDischargeProfitable
-    ? Math.min(remainingDemandKwh, availableDischargeKwh)
-    : 0
-  const dischargeToGridKwh = plan.batteryExportProfitable
-    ? availableDischargeKwh - dischargeToHomeKwh
-    : 0
-  const batteryDischargeKwh = dischargeToHomeKwh + dischargeToGridKwh
-
-  return {
-    batteryChargeKwh: 0,
-    batteryDischargeKwh,
-    gridImportKwh: remainingDemandKwh - dischargeToHomeKwh,
-    gridExportKwh: surplusSolarKwh + evExportKwh + dischargeToGridKwh,
-    batteryStateOfChargeKwh:
-      batteryStateOfChargeKwh - batteryDischargeKwh / BATTERY_ASSUMPTIONS.dischargeEfficiency,
-  }
-}
-
-const dispatchOffPeakBattery = (
-  isCheapHour: boolean,
-  remainingDemandKwh: number,
-  surplusSolarKwh: number,
-  evExportKwh: number,
-  batteryStateOfChargeKwh: number,
-  plan: StoragePlan,
-): BatteryDispatch => {
-  const solarChargeKwh = plan.shouldStoreSolar
-    ? Math.min(
-        surplusSolarKwh,
-        plan.maxBatteryChargeKwh,
-        Math.max(0, plan.batteryCapacityKwh - batteryStateOfChargeKwh) /
-          BATTERY_ASSUMPTIONS.chargeEfficiency,
-      )
-    : 0
-  const stateOfChargeAfterSolarKwh =
-    batteryStateOfChargeKwh + solarChargeKwh * BATTERY_ASSUMPTIONS.chargeEfficiency
-  const gridChargeKwh = isCheapHour
-    ? Math.min(
-        plan.maxBatteryChargeKwh - solarChargeKwh,
-        Math.max(0, plan.cheapChargeTargetKwh - stateOfChargeAfterSolarKwh) /
-          BATTERY_ASSUMPTIONS.chargeEfficiency,
-      )
-    : 0
-
-  return {
-    batteryChargeKwh: solarChargeKwh + gridChargeKwh,
-    batteryDischargeKwh: 0,
-    gridImportKwh: remainingDemandKwh + gridChargeKwh,
-    gridExportKwh: surplusSolarKwh - solarChargeKwh + evExportKwh,
-    batteryStateOfChargeKwh:
-      stateOfChargeAfterSolarKwh + gridChargeKwh * BATTERY_ASSUMPTIONS.chargeEfficiency,
-  }
-}
-
-const dispatchBattery = (
-  hasBattery: boolean,
-  isPeakHour: boolean,
-  isCheapHour: boolean,
-  remainingDemandKwh: number,
-  surplusSolarKwh: number,
-  evExportKwh: number,
-  batteryStateOfChargeKwh: number,
-  plan: StoragePlan,
-): BatteryDispatch => {
-  if (!hasBattery) {
-    return {
-      batteryChargeKwh: 0,
-      batteryDischargeKwh: 0,
-      gridImportKwh: remainingDemandKwh,
-      gridExportKwh: surplusSolarKwh + evExportKwh,
-      batteryStateOfChargeKwh,
-    }
-  }
-  if (isPeakHour) {
-    return dispatchPeakBattery(
-      remainingDemandKwh,
-      surplusSolarKwh,
-      evExportKwh,
-      batteryStateOfChargeKwh,
-      plan,
-    )
-  }
-  return dispatchOffPeakBattery(
-    isCheapHour,
-    remainingDemandKwh,
-    surplusSolarKwh,
-    evExportKwh,
-    batteryStateOfChargeKwh,
-    plan,
-  )
-}
 
 export const dispatchEnergy = (
   { household, assets }: HouseholdScenario,
@@ -177,16 +33,16 @@ export const dispatchEnergy = (
         state.evStateOfChargeKwh,
         plan,
       )
-      const batteryDispatch = dispatchBattery(
-        Boolean(assets.battery),
+      const batteryDispatch = dispatchBattery({
+        hasBattery: Boolean(assets.battery),
         isPeakHour,
-        isWithinWindow(hour, tariff.nightStartHour, tariff.nightEndHour),
-        evDispatch.remainingDemandKwh,
+        isCheapHour: isWithinWindow(hour, tariff.nightStartHour, tariff.nightEndHour),
+        remainingDemandKwh: evDispatch.remainingDemandKwh,
         surplusSolarKwh,
-        evDispatch.evExportKwh,
-        state.batteryStateOfChargeKwh,
+        evExportKwh: evDispatch.evExportKwh,
+        batteryStateOfChargeKwh: state.batteryStateOfChargeKwh,
         plan,
-      )
+      })
       const batteryStateOfChargeKwh = Math.min(
         plan.batteryCapacityKwh,
         Math.max(plan.batteryReserveKwh, batteryDispatch.batteryStateOfChargeKwh),
