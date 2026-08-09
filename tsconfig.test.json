@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "test-support/*": ["../tests/support/*"]
+    },
+    "types": ["vite/client", "vitest/globals"]
+  },
+  "include": ["src", "tests"]
+}

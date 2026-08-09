@@ -1,0 +1,49 @@
+import type { HourlyEnergyFlow } from './simulation'
+import type { HouseholdScenario } from './householdScenarios'
+
+export type ElectricityTariff = {
+  nightImportGbpPerKwh: number
+  dayImportGbpPerKwh: number
+  exportGbpPerKwh: number
+  peakExportGbpPerKwh: number
+  standingChargeGbpPerDay: number
+  nightStartHour: number
+  nightEndHour: number
+  peakExportStartHour: number
+  peakExportEndHour: number
+  effectivePeriod: string
+}
+
+export type PeriodBill = {
+  supplierBill: number
+  exportEarnings: number
+  netCost: number
+}
+
+export type BillEstimate = {
+  daily: PeriodBill
+  monthly: PeriodBill
+  annual: PeriodBill
+}
+
+export type ScenarioFinancialResult = {
+  scenario: HouseholdScenario
+  energyFlows: HourlyEnergyFlow[]
+  bill: BillEstimate
+  monthlySavings: number
+  annualSavings: number
+}
+
+export type FinancialComparison = {
+  demandScale: number
+  inferredDailyDemandKwh: number
+  inferredAnnualDemandKwh: number
+  results: ScenarioFinancialResult[]
+}
+
+export type CalibrationError = {
+  kind: 'calibration-error'
+  message: string
+  minimumMonthlySupplierBill: number
+  maximumMonthlySupplierBill?: number
+}
