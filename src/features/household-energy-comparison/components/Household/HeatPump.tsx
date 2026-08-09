@@ -1,7 +1,7 @@
-import { type HouseholdFormDraft } from 'features/household-energy-comparison/models/schema'
+import { type HouseholdFormDraft } from 'features/household-energy-comparison/models/formSchema'
 import { DetailCard } from './HouseholdDetail'
-import { NumberField } from './Number'
-import { BooleanField } from './Boolean'
+import { NumberField } from './NumberField'
+import { BooleanField } from './BooleanField'
 
 export const HeatPump = (props: { values: HouseholdFormDraft }) => (
   <DetailCard title="Heat Pump">

@@ -1,4 +1,4 @@
-import type { HouseholdAssessment } from 'features/household-energy-comparison/models/schema'
+import type { HouseholdAssessment } from 'features/household-energy-comparison/models/assessment'
 import type { HouseholdScenario } from 'features/household-energy-comparison/models/householdScenarios'
 import { addScenario } from './addScenario'
 

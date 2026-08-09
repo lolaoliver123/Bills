@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'compo
 import {
   type HouseholdFormDraft,
   householdFormSchema,
-} from 'features/household-energy-comparison/models/schema'
+} from 'features/household-energy-comparison/models/formSchema'
 import { HouseholdFields } from './Household'
 
 const validationErrors = (values: HouseholdFormDraft): FormikErrors<HouseholdFormDraft> => {

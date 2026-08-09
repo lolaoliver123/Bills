@@ -185,6 +185,26 @@ describe('daily energy simulation', () => {
     ).toBe(true)
   })
 
+  it('dispatches during a peak window that crosses midnight', () => {
+    const tariff = {
+      ...DEFAULT_ELECTRICITY_TARIFF,
+      peakExportStartHour: 22,
+      peakExportEndHour: 2,
+    }
+    const result = simulateDailyEnergy(scenario({ battery }), { tariff })
+
+    expect(
+      result
+        .filter(({ hour }) => [0, 1, 22, 23].includes(hour))
+        .some(({ batteryDischargeKwh }) => batteryDischargeKwh > 0),
+    ).toBe(true)
+    expect(
+      result
+        .filter(({ hour }) => ![0, 1, 22, 23].includes(hour))
+        .every(({ batteryDischargeKwh }) => batteryDischargeKwh === 0),
+    ).toBe(true)
+  })
+
   it('keeps state of charge within reserve and total capacity', () => {
     const result = simulateDailyEnergy(
       scenario({

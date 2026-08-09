@@ -1,6 +1,6 @@
-import { NumberField } from './Number'
-import type { HouseholdFormDraft } from 'features/household-energy-comparison/models/schema'
-import { BooleanField } from './Boolean'
+import { NumberField } from './NumberField'
+import type { HouseholdFormDraft } from 'features/household-energy-comparison/models/formSchema'
+import { BooleanField } from './BooleanField'
 import { DetailCard } from './HouseholdDetail'
 
 export const ElectricVehicle = (props: { values: HouseholdFormDraft }) => (

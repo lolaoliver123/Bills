@@ -1,4 +1,4 @@
-import { getSolarCapacityKw } from 'features/household-energy-comparison/models/schema'
+import { getSolarCapacityKw } from 'features/household-energy-comparison/models/assets'
 import type { HouseholdScenario } from 'features/household-energy-comparison/models/householdScenarios'
 import {
   DAYS_PER_YEAR,

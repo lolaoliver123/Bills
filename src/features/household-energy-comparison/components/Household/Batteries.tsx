@@ -1,10 +1,10 @@
 import {
   type BatterySystem,
   getBatteryCapacityKwh,
-  type HouseholdFormDraft,
-} from 'features/household-energy-comparison/models/schema'
-import { BooleanField } from './Boolean'
-import { NumberField } from './Number'
+} from 'features/household-energy-comparison/models/assets'
+import type { HouseholdFormDraft } from 'features/household-energy-comparison/models/formSchema'
+import { BooleanField } from './BooleanField'
+import { NumberField } from './NumberField'
 import { DetailCard } from './HouseholdDetail'
 import { CalculatedField } from './Calculated'
 
@@ -22,9 +22,7 @@ export const Batteries = (props: { values: HouseholdFormDraft }) => (
     <BooleanField name="hasBatteries" label="Does the household have batteries?" />
     {props.values.hasBatteries !== undefined ? (
       <DetailCard
-        title={
-          props.values.hasBatteries ? 'Installed battery storage' : 'Proposed battery storage'
-        }
+        title={props.values.hasBatteries ? 'Installed battery storage' : 'Proposed battery storage'}
       >
         <NumberField name="battery.unitCapacityKwh" label="Average battery capacity" unit="kWh" />
         <NumberField name="battery.unitCount" label="Number of batteries" />

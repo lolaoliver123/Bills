@@ -11,12 +11,43 @@ import {
 import type { HourlyEnergyFlow } from 'features/household-energy-comparison/models/simulation'
 import { DEFAULT_ELECTRICITY_TARIFF } from 'features/household-energy-comparison/calculations/billing/config'
 import { formatCalculatedValue } from 'features/household-energy-comparison/components/formatCalculatedValue'
+import { getHourWindowSegments } from 'features/household-energy-comparison/calculations/tariff'
 
 type NetBarChartProps = {
   data: HourlyEnergyFlow[]
 }
 
 const HOUR_TICKS = Array.from({ length: 6 }, (_, index) => index * 4)
+
+const TariffWindow = (props: {
+  startHour: number
+  endHour: number
+  fill: string
+  fillOpacity: number
+  label: string
+  labelFill: string
+}) =>
+  getHourWindowSegments(props.startHour, props.endHour).map((segment, index) => (
+    <ReferenceArea
+      key={`${props.label}-${segment.startHour}`}
+      x1={segment.startHour - 0.5}
+      x2={segment.endHour - 0.5}
+      fill={props.fill}
+      fillOpacity={props.fillOpacity}
+      strokeOpacity={0}
+      label={
+        index === 0
+          ? {
+              value: props.label,
+              position: 'insideTop',
+              fill: props.labelFill,
+              fontWeight: 600,
+              fontSize: 12,
+            }
+          : undefined
+      }
+    />
+  ))
 
 export const NetBarChart = ({ data }: NetBarChartProps) => {
   const chartData = data.map((flow) => ({
@@ -52,33 +83,21 @@ export const NetBarChart = ({ data }: NetBarChartProps) => {
       />
       <YAxis unit=" kWh" tickFormatter={(value) => formatCalculatedValue(Number(value))} />
       <Tooltip formatter={(value) => `${formatCalculatedValue(Number(value))} kWh`} />
-      <ReferenceArea
-        x1={DEFAULT_ELECTRICITY_TARIFF.nightStartHour - 0.5}
-        x2={DEFAULT_ELECTRICITY_TARIFF.nightEndHour - 0.5}
+      <TariffWindow
+        startHour={DEFAULT_ELECTRICITY_TARIFF.nightStartHour}
+        endHour={DEFAULT_ELECTRICITY_TARIFF.nightEndHour}
         fill="var(--chart-cheap-window)"
         fillOpacity={0.16}
-        strokeOpacity={0}
-        label={{
-          value: 'Cheap hours',
-          position: 'insideTop',
-          fill: 'var(--question)',
-          fontWeight: 600,
-          fontSize: 12,
-        }}
+        label="Cheap hours"
+        labelFill="var(--question)"
       />
-      <ReferenceArea
-        x1={DEFAULT_ELECTRICITY_TARIFF.peakExportStartHour - 0.5}
-        x2={DEFAULT_ELECTRICITY_TARIFF.peakExportEndHour - 0.5}
+      <TariffWindow
+        startHour={DEFAULT_ELECTRICITY_TARIFF.peakExportStartHour}
+        endHour={DEFAULT_ELECTRICITY_TARIFF.peakExportEndHour}
         fill="var(--chart-peak-window)"
         fillOpacity={0.13}
-        strokeOpacity={0}
-        label={{
-          value: 'Peak hours',
-          position: 'insideTop',
-          fill: 'var(--chart-peak-window)',
-          fontWeight: 600,
-          fontSize: 12,
-        }}
+        label="Peak hours"
+        labelFill="var(--chart-peak-window)"
       />
       <ReferenceLine y={0} stroke="#000" />
       <Bar

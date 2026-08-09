@@ -3,6 +3,32 @@
 React and TypeScript prototype for comparing a household's current heat-pump, solar, and battery setup with proposed
 solar and battery additions.
 
+## Requirements
+
+- Node.js `20.19+` or `22.12+` (required by Vite 8)
+- npm, using the version bundled with a supported Node.js release
+
+## Getting started
+
+```sh
+npm ci
+npm run dev
+```
+
+Vite prints the local development URL, normally `http://localhost:5173`.
+
+## Project structure
+
+- `src/app`: application providers, routing, and global styles;
+- `src/components/ui`: reusable UI primitives;
+- `src/features/household-energy-comparison/components`: form and result presentation;
+- `src/features/household-energy-comparison/models`: form, assessment, asset, billing, and simulation types;
+- `src/features/household-energy-comparison/calculations`: tariff, billing, profile, and dispatch logic;
+- `tests`: Vitest unit tests mirroring the feature structure.
+
+Submitted answers and results are stored in React memory only. Reloading the results route clears the assessment and
+returns to the setup form.
+
 ## Data model
 
 The form uses a UI-only draft for conditional Yes/No questions. On submission it is validated and mapped into a
@@ -34,7 +60,8 @@ Battery dispatch uses these fixed assumptions per unit:
 - 5 kW maximum charge and discharge power;
 - 95% charging efficiency and 95% discharging efficiency;
 - 10% minimum reserve and starting state of charge;
-- value-aware grid charging from 00:00–05:00, capped by forecast peak demand unless peak export is also profitable;
+- value-aware grid charging during the configured cheap period (00:00–07:00 by default), capped by forecast peak demand
+  unless peak export is also profitable;
 - charging from surplus solar when its later value exceeds immediate export income;
 - discharge from 16:00–19:00, serving the household before exporting economically eligible energy;
 - no simultaneous battery charging and discharging during the peak period.
@@ -90,8 +117,26 @@ financing costs.
 ## Commands
 
 ```sh
-npm run dev
-npm test
-npm run build
-npm run lint
+npm run dev          # start the development server
+npm test             # run the unit test suite once
+npm run build        # type-check and create a production build
+npm run preview      # serve the production build locally
+npm run lint         # run ESLint
+npm run format       # format the repository with Prettier
+npm run format:check # check formatting without changing files
 ```
+
+The tests cover form-to-domain mapping, scenario construction, tariff boundaries, bill calibration, hourly simulation,
+storage constraints, and energy conservation. Coverage reporting is available through Vitest's installed V8 provider,
+for example with `npm test -- --coverage`.
+
+## Deployment
+
+The production output is written to `dist`. Deploy it as a static single-page application and configure the host to
+serve `index.html` for unknown routes so that `/results` can be handled by React Router. The results route still requires
+an assessment from the current browser session and otherwise redirects to `/`.
+
+## Project status
+
+This is an illustrative prototype rather than a quotation tool. Browser support follows Vite's default modern-browser
+production target. No contribution process or software licence has been specified yet.

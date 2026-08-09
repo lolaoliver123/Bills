@@ -2,13 +2,12 @@ import { useFormikContext } from 'formik'
 import {
   type HouseholdFormDraft,
   MAX_MONTHLY_ELECTRICITY_COST_GBP,
-} from 'features/household-energy-comparison/models/schema'
-import { NumberField } from './Number'
+} from 'features/household-energy-comparison/models/formSchema'
+import { NumberField } from './NumberField'
 import { HeatPump } from './HeatPump'
 import { Solar } from './Solar'
 import { Batteries } from './Batteries'
 import { ElectricVehicle } from './ElectricVehicle'
-
 
 export const HouseholdFields = () => {
   const { values } = useFormikContext<HouseholdFormDraft>()

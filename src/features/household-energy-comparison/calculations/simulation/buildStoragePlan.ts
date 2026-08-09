@@ -1,4 +1,4 @@
-import { getBatteryCapacityKwh } from 'features/household-energy-comparison/models/schema'
+import { getBatteryCapacityKwh } from 'features/household-energy-comparison/models/assets'
 import type { ElectricityTariff } from 'features/household-energy-comparison/models/billing'
 import type { HouseholdScenario } from 'features/household-energy-comparison/models/householdScenarios'
 import { BATTERY_ASSUMPTIONS, EV_ASSUMPTIONS, EV_RESERVE_FRACTION } from './config'
@@ -6,6 +6,10 @@ import type { StoragePlan } from 'features/household-energy-comparison/models/st
 import { forecastPeakDemand } from './forecastPeakDemand'
 import { calculateDesiredPeakStoredKwh } from './calculateDesiredPeakStoredKwh'
 import type { EnergyProfiles } from 'features/household-energy-comparison/models/simulation'
+import {
+  getHoursInWindow,
+  isHourInWindow,
+} from 'features/household-energy-comparison/calculations/tariff'
 
 export const buildStoragePlan = (
   scenario: HouseholdScenario,
@@ -37,7 +41,7 @@ export const buildStoragePlan = (
     Math.max(tariff.dayImportGbpPerKwh, tariff.peakExportGbpPerKwh) * batteryRoundTripEfficiency >
     tariff.exportGbpPerKwh
 
-  const peakHours = tariff.peakExportEndHour - tariff.peakExportStartHour
+  const peakHours = getHoursInWindow(tariff.peakExportStartHour, tariff.peakExportEndHour).length
   const peakDispatchableStoredKwh = Math.min(
     Math.max(0, batteryCapacityKwh - batteryReserveKwh),
     (maxBatteryDischargeKwh * peakHours) / BATTERY_ASSUMPTIONS.dischargeEfficiency,
@@ -59,7 +63,11 @@ export const buildStoragePlan = (
   })
   const forecastSolarStoredKwh = shouldStoreSolar
     ? profiles.electricityDemandKwh.reduce((total, demandKwh, hour) => {
-        if (hour < tariff.nightEndHour || hour >= tariff.peakExportStartHour) return total
+        if (
+          isHourInWindow(hour, tariff.nightStartHour, tariff.nightEndHour) ||
+          isHourInWindow(hour, tariff.peakExportStartHour, tariff.peakExportEndHour)
+        )
+          return total
         const surplusKwh = Math.max(0, profiles.solarGenerationKwh[hour] - demandKwh)
         return (
           total + Math.min(surplusKwh, maxBatteryChargeKwh) * BATTERY_ASSUMPTIONS.chargeEfficiency

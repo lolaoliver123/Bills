@@ -1,11 +1,13 @@
 import { useState, type ReactNode } from 'react'
 import { HouseholdEnergyComparisonContext } from 'features/household-energy-comparison/context'
 import {
-  type HouseholdAssessment,
   type HouseholdFormDraft,
   initialValues,
+} from 'features/household-energy-comparison/models/formSchema'
+import {
+  type HouseholdAssessment,
   toHouseholdAssessment,
-} from 'features/household-energy-comparison/models/schema'
+} from 'features/household-energy-comparison/models/assessment'
 
 export const HouseholdEnergyComparisonProvider = ({ children }: { children: ReactNode }) => {
   const [draft, setDraft] = useState<HouseholdFormDraft>(initialValues)

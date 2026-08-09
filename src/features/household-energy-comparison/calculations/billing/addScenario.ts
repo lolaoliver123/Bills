@@ -1,7 +1,5 @@
-import type {
-  EnergyAssets,
-  HouseholdAssessment,
-} from 'features/household-energy-comparison/models/schema'
+import type { HouseholdAssessment } from 'features/household-energy-comparison/models/assessment'
+import type { EnergyAssets } from 'features/household-energy-comparison/models/assets'
 import type {
   HouseholdScenario,
   ScenarioId,

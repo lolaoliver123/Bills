@@ -1,4 +1,5 @@
-import type { EnergyAssets, HouseholdProfile } from './schema'
+import type { HouseholdProfile } from './assessment'
+import type { EnergyAssets } from './assets'
 
 export type ScenarioId = 'current' | 'solar' | 'battery' | 'solar-battery'
 
@@ -9,6 +10,3 @@ export type HouseholdScenario = {
   household: HouseholdProfile
   assets: EnergyAssets
 }
-
-
-

@@ -1,12 +1,12 @@
-import { BooleanField } from './Boolean'
+import { BooleanField } from './BooleanField'
 import {
   getSolarCapacityKw,
-  type HouseholdFormDraft,
   PROPOSED_SOLAR_PANEL_CAPACITY_KW,
   type SolarSystem,
-} from 'features/household-energy-comparison/models/schema'
+} from 'features/household-energy-comparison/models/assets'
+import type { HouseholdFormDraft } from 'features/household-energy-comparison/models/formSchema'
 import { DetailCard } from './HouseholdDetail'
-import { NumberField } from './Number'
+import { NumberField } from './NumberField'
 import { CalculatedField } from './Calculated'
 
 const solarCapacity = (values: HouseholdFormDraft): number | undefined => {

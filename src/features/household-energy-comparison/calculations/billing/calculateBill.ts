@@ -1,16 +1,15 @@
 import type { BillEstimate, PeriodBill } from 'features/household-energy-comparison/models/billing'
 import { DAYS_PER_YEAR, DEFAULT_ELECTRICITY_TARIFF, MONTHS_PER_YEAR } from './config'
 import type { HourlyEnergyFlow } from 'features/household-energy-comparison/models/simulation'
+import {
+  getExportRate,
+  getImportRate,
+} from 'features/household-energy-comparison/calculations/tariff'
 
-export const getImportRate = (hour: number, tariff = DEFAULT_ELECTRICITY_TARIFF): number =>
-  hour >= tariff.nightStartHour && hour < tariff.nightEndHour
-    ? tariff.nightImportGbpPerKwh
-    : tariff.dayImportGbpPerKwh
-
-export const getExportRate = (hour: number, tariff = DEFAULT_ELECTRICITY_TARIFF): number =>
-  hour >= tariff.peakExportStartHour && hour < tariff.peakExportEndHour
-    ? tariff.peakExportGbpPerKwh
-    : tariff.exportGbpPerKwh
+export {
+  getExportRate,
+  getImportRate,
+} from 'features/household-energy-comparison/calculations/tariff'
 
 const scalePeriodBill = (bill: PeriodBill, factor: number): PeriodBill => ({
   supplierBill: bill.supplierBill * factor,

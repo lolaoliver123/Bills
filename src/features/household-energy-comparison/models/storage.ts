@@ -1,4 +1,3 @@
-
 export type StoragePlan = {
   batteryCapacityKwh: number
   batteryReserveKwh: number

@@ -1,7 +1,7 @@
 import type { BillEstimate } from 'features/household-energy-comparison/models/billing'
 import type { HourlyEnergyFlow } from 'features/household-energy-comparison/models/simulation'
 import { CardContent } from 'components/ui/card'
-import { NetBarChart } from 'features/household-energy-comparison/components/Household/Graph'
+import { NetBarChart } from 'features/household-energy-comparison/components/Household/EnergyFlowChart'
 import { ComparisonResultValue } from './ComparisonResultValue'
 
 const currency = new Intl.NumberFormat('en-GB', {
