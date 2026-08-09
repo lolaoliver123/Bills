@@ -1,6 +1,6 @@
 import { useField } from 'formik'
-import { Label } from 'components/ui/label'
-import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group'
+import { Label } from 'components/ui/label.tsx'
+import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group.tsx'
 
 export const BooleanField = ({ name, label }: { name: string; label: string }) => {
   const [field, meta, helpers] = useField<boolean | undefined>(name)

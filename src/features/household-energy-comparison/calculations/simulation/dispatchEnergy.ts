@@ -4,27 +4,8 @@ import type { HourlyEnergyFlow } from 'features/household-energy-comparison/mode
 import type { EnergyProfiles } from './buildEnergyProfiles'
 import type { StoragePlan } from './buildStoragePlan'
 import { BATTERY_ASSUMPTIONS, EV_ASSUMPTIONS } from './config'
+import type { BatteryDispatch, DispatchState, EvDispatch } from 'features/household-energy-comparison/models/dispatches'
 
-type EvDispatch = {
-  remainingDemandKwh: number
-  evDischargeKwh: number
-  evExportKwh: number
-  evStateOfChargeKwh: number
-}
-
-type BatteryDispatch = {
-  batteryChargeKwh: number
-  batteryDischargeKwh: number
-  gridImportKwh: number
-  gridExportKwh: number
-  batteryStateOfChargeKwh: number
-}
-
-type DispatchState = {
-  flows: HourlyEnergyFlow[]
-  evStateOfChargeKwh: number
-  batteryStateOfChargeKwh: number
-}
 
 const isWithinWindow = (hour: number, startHour: number, endHour: number): boolean =>
   hour >= startHour && hour < endHour

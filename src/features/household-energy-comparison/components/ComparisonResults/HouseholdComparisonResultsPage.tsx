@@ -2,9 +2,9 @@ import { ArrowLeft } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Button } from 'components/ui/button'
 import { useHouseholdEnergyComparison } from 'features/household-energy-comparison/context'
-import { buildHouseholdScenarios } from 'features/household-energy-comparison/models/householdScenarios'
-import { ComparisonResults } from 'features/household-energy-comparison/components/ComparisonResults/ComparisonResults'
 import { buildFinancialComparison } from 'features/household-energy-comparison/calculations/billing/buildFinancialComparison'
+import { buildHouseholdScenarios } from 'features/household-energy-comparison/calculations/billing/buildHouseholdScenario'
+import { ComparisonResults } from './ComparisonResults'
 
 export const HouseholdComparisonResultsPage = () => {
   const navigate = useNavigate()

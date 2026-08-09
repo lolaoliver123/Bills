@@ -7,11 +7,11 @@ import {
   type BatterySystem,
   type HouseholdFormDraft,
   type SolarSystem,
-} from 'features/household-energy-comparison/models/schema'
-import { BooleanField } from './Boolean'
-import { NumberField } from './Number'
-import { CalculatedField } from './Calculated'
-import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card'
+} from 'features/household-energy-comparison/models/schema.ts'
+import { BooleanField } from './Boolean.tsx'
+import { NumberField } from './Number.tsx'
+import { CalculatedField } from '../Calculated.tsx'
+import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card.tsx'
 
 const DetailCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <Card className="border-primary/15 bg-muted/30 shadow-none">

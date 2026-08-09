@@ -1,7 +1,7 @@
 import type { BillEstimate } from 'features/household-energy-comparison/models/billing'
 import type { HourlyEnergyFlow } from 'features/household-energy-comparison/models/simulation'
 import { CardContent } from 'components/ui/card'
-import { NetBarChart } from 'features/household-energy-comparison/components/Graph'
+import { NetBarChart } from 'features/household-energy-comparison/components/Household/Graph'
 import { ComparisonResultValue } from './ComparisonResultValue'
 
 const currency = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' })
@@ -40,7 +40,10 @@ export const ComparisonResultContent = (props: {
         />
         {props.showSavings && (
           <>
-            <ComparisonResultValue title="Monthly saving" value={formatSavings(props.monthlySavings)} />
+            <ComparisonResultValue
+              title="Monthly saving"
+              value={formatSavings(props.monthlySavings)}
+            />
             <ComparisonResultValue
               title="Annual saving"
               value={formatSavings(props.annualSavings)}
